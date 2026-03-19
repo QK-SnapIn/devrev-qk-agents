@@ -4,6 +4,10 @@ AI-powered agents that plan, build, and test snap-ins, connectors, and dashboard
 
 > **Stop building DevRev connectors and dashboards manually.** These agents handle the full pipeline — from gathering requirements to generating deployable code/configs to running end-to-end tests.
 
+## Architecture
+
+![DevRev Agents — Complete Architecture](devrev_agents_mindmap.png)
+
 ## What's inside
 
 ### Snap-in vertical (v1.0)
@@ -103,31 +107,9 @@ You: "Test the dashboard metrics against Notebook"
 
 ## How the pipelines work
 
-### Snap-in pipeline
+See the [architecture diagram above](#architecture) for the complete flow. Both verticals follow the same pattern:
 
-```
-┌─────────────┐     Handoff      ┌──────────────┐     Handoff     ┌─────────────┐
-│   Snap-in   │ ──────────────→  │   Snap-in    │ ─────────────→  │   Snap-in   │
-│     PM      │   PRD + TDD      │  Architect   │  Code + deploy  │   Tester    │
-│             │   + diagrams     │              │  + TECH_DEC.md  │             │
-└─────────────┘                  └──────────────┘                 └─────────────┘
-  Requirements                    Research →                       Unit tests
-  Discovery                       15 decisions →                   UI automation
-  Feasibility                     All files to disk                Ship/block
-```
-
-### Implementation pipeline
-
-```
-┌─────────────┐     Handoff      ┌──────────────┐     Handoff     ┌─────────────┐
-│   Impl.     │ ──────────────→  │   Impl.      │ ─────────────→  │   Impl.     │
-│     PM      │  Dashboard spec  │  Architect   │  Widget JSON +  │   Tester    │
-│             │  + widget specs  │              │  dashboard JSON │             │
-└─────────────┘                  └──────────────┘                 └─────────────┘
-  Discovery rounds                Read 3 references                JSON validation
-  Viz recommendations             Generate JSON                    UI deployment
-  Fix specs (bug mode)            Fix mode: diff                   Notebook verify
-```
+**PM** (plan) → **Architect** (build) → **Tester** (verify) — with bugs flowing back upstream.
 
 ## Key technical facts
 
@@ -157,9 +139,12 @@ The agents produce PRDs and TDDs matching actual DevRev team documents:
 
 ## Contributing
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide — setup for Claude Code and Cursor, how to report skill issues, how to improve agent skills, and how to add new skills.
+
+Quick version:
 1. Fork the repo
 2. Test locally: `claude --plugin-dir .`
-3. Make changes to skills/agents/commands
+3. Fix skill issues with `/devrev:improve-skill <what went wrong>`
 4. Submit a PR
 
 ## License
