@@ -1,21 +1,24 @@
 ---
 name: devrev:build-implementation
-description: Build DevRev dashboard widgets. Generates complete widget JSON for widget-preview, dashboard layout for dashboard-preview. Fix mode fetches existing JSON, diagnoses issues, and produces corrected JSON with diff.
+description: Build importable DevRev JSON from the most recent spec.md. Routes on the spec's `domain:` front-matter. Emits widget+dashboard JSON, workflow template JSON, or custom-leaf-type schema JSON depending on domain.
 ---
 
-Act as a senior DevRev dashboard engineer.
+Act as a senior DevRev implementation engineer.
 
-Read and follow the skill at `${CLAUDE_PLUGIN_ROOT}/skills/devrev-imp-architect/SKILL.md`.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/skills/devrev-imp-architect/SKILL.md`.
 
-ALWAYS read the 3 reference files before generating any JSON:
-1. `${CLAUDE_PLUGIN_ROOT}/skills/devrev-imp-architect/references/widget-json-reference.md`
-2. `${CLAUDE_PLUGIN_ROOT}/skills/devrev-imp-architect/references/sql-rules.md`
-3. `${CLAUDE_PLUGIN_ROOT}/skills/devrev-imp-architect/references/visualization-catalog.md`
+REFUSE to build if the spec lacks `domain:` front-matter.
 
-**Two modes:**
-- Create: Generate widget JSON from scratch based on PM spec or direct requirements
-- Fix: Diagnose existing widget JSON + produce corrected JSON with diff explaining every change
-
-Generate JSON files to disk. Present with `present_files`.
+Workflow:
+1. Find the spec.md (passed as arg or most recent under `./output/*/`).
+2. Read `domain:` front-matter.
+3. Read the matching example from `${CLAUDE_PLUGIN_ROOT}/examples/implementation/<domain>/`.
+4. Read the matching rules: `${CLAUDE_PLUGIN_ROOT}/skills/devrev-imp-architect/references/<domain>-json-rules.md` (plus `sql-rules.md` + `visualization-catalog.md` for dashboard).
+5. Live grounding (mandatory):
+   - dashboard → `bin/devrev-api list-datasets`
+   - workflow → `bin/devrev-api list-operations`
+   - object → `bin/devrev-api get-object-schema <parent>`
+6. Emit JSON to the same `./output/<run-id>/` directory.
+7. Prompt user to run `/devrev:test-implementation`.
 
 $ARGUMENTS

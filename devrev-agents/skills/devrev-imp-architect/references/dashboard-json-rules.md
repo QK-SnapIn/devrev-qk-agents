@@ -1,6 +1,18 @@
-# Widget JSON Reference
+# Dashboard JSON Rules
 
-Complete reference for building DevRev widget configurations. This merges the widget building guide, dashboard cheat sheet, and visualization types catalog.
+Complete reference for building DevRev widget + dashboard JSON. Read alongside `examples/implementation/dashboard/widget-csat-agent.json` and `examples/implementation/dashboard/dashboard-csat-agent.json` for n-shot grounding.
+
+## Live grounding (mandatory)
+
+Before assigning any `data_sources[].oasis.datasets` entry, the architect MUST run:
+
+```bash
+bin/devrev-api list-datasets
+```
+
+This guarantees the widget only references oasis datasets that actually exist in *this* tenant. Pick the dataset whose `name` and columns match the user's intent — do NOT hard-code names like `system.dim_ticket` from memory.
+
+For SQL grammar rules, see `./sql-rules.md`. For valid `visualization.type` values, see `./visualization-catalog.md`.
 
 ---
 

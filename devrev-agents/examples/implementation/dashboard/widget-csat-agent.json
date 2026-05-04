@@ -1,0 +1,728 @@
+{
+  "data_sources": [
+    {
+      "dimensions": [
+        {
+          "devrev_schema": {
+            "field_type": "id",
+            "data_name": "Owner",
+            "db_name": "Owner",
+            "id_type": [
+              "dev_user"
+            ],
+            "is_filterable": true,
+            "name": "Owner",
+            "oasis": {
+              "name": "Owner"
+            },
+            "ui": {
+              "display_name": "Agent Name",
+              "placeholder": "Add Agent"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "owner_id",
+            "type": "string"
+          },
+          "reference_name": "owner_id",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "timestamp",
+            "data_name": "response_month",
+            "db_name": "response_month",
+            "is_filterable": true,
+            "name": "response_month",
+            "oasis": {
+              "name": "response_month"
+            },
+            "ui": {
+              "display_name": "Response Month",
+              "is_sortable": true,
+              "placeholder": "Add Response Month"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "DATE_TRUNC('month', csat_response_date)",
+            "timestamp_rollup": "month",
+            "type": "time"
+          },
+          "reference_name": "response_month",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "enum",
+            "allowed_values": [
+              "Retail",
+              "Group Products",
+              "Short Call",
+              "Other Vertical",
+              "Assurance Products",
+              "Customer Details Not Found"
+            ],
+            "data_name": "business_type",
+            "db_name": "business_type",
+            "is_filterable": true,
+            "name": "business_type",
+            "oasis": {
+              "name": "business_type"
+            },
+            "ui": {
+              "display_name": "Business Type",
+              "is_sortable": true,
+              "placeholder": "Add Business Type"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "business_type",
+            "type": "string"
+          },
+          "reference_name": "business_type",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "enum",
+            "allowed_values": [
+              "N/A",
+              "Health Insurance",
+              "Four Wheeler",
+              "Two Wheeler",
+              "Health Saathi",
+              "Salary Protect",
+              "Shop Saathi",
+              "Fast tag",
+              "Shop Insurance",
+              "Super Top Up",
+              "Loan Insurance",
+              "DTH",
+              "Cyber Fraud",
+              "Pollution Protect",
+              "Critical Illness",
+              "Complete Appliance",
+              "Travel Protect",
+              "Personal Accident",
+              "Income protect",
+              "Mobile Screen Protection",
+              "Cancer Care",
+              "Games",
+              "Profile",
+              "Loan",
+              "Passenger Carrying Vehicle",
+              "Term Life",
+              "Merchant Suraksha",
+              "Loan Shield",
+              "Bank",
+              "Travel",
+              "UPI",
+              "QR and Soundbox",
+              "Money",
+              "Recharge",
+              "Road Side Assistance",
+              "Travel Pass",
+              "Home Appliance"
+            ],
+            "data_name": "product_types",
+            "db_name": "product_types",
+            "is_filterable": true,
+            "name": "product_types",
+            "oasis": {
+              "name": "product_types"
+            },
+            "ui": {
+              "display_name": "Product Type",
+              "is_sortable": true,
+              "placeholder": "Add Product Type"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "product_types",
+            "type": "string"
+          },
+          "reference_name": "product_types",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "array",
+            "base_type": "id",
+            "data_name": "tag_id",
+            "db_name": "tag_id",
+            "id_type": [
+              "tag"
+            ],
+            "is_filterable": true,
+            "name": "tag_id",
+            "oasis": {
+              "name": "tag_id"
+            },
+            "ui": {
+              "display_name": "Tags",
+              "placeholder": "Add Tags"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "JSON_EXTRACT_STRING(tags_json, '$[*].tag_id')",
+            "type": "string_array"
+          },
+          "reference_name": "tags",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "id",
+            "data_name": "group",
+            "db_name": "group",
+            "id_type": [
+              "group"
+            ],
+            "is_filterable": true,
+            "name": "group",
+            "oasis": {
+              "name": "group"
+            },
+            "ui": {
+              "display_name": "Group",
+              "placeholder": "Add Group"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "group_id",
+            "type": "string"
+          },
+          "reference_name": "group_name",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "enum",
+            "allowed_values": [
+              "Parent",
+              "Child",
+              "NA"
+            ],
+            "data_name": "association_type",
+            "db_name": "association_type",
+            "is_filterable": true,
+            "name": "association_type",
+            "oasis": {
+              "name": "association_type"
+            },
+            "ui": {
+              "display_name": "Association Type",
+              "is_sortable": true,
+              "placeholder": "Add Association Type"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "association_type",
+            "type": "string"
+          },
+          "reference_name": "association_type",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "enum",
+            "allowed_values": [
+              "General Enquiry",
+              "Policy Document",
+              "Endorsement",
+              "Cancellation",
+              "Claim Intimation",
+              "Inspection",
+              "Refund",
+              "Claim Support",
+              "Vahan Update",
+              "Claim Query",
+              "Shortfall Amount",
+              "Claim Status",
+              "DND",
+              "Jeet Kumar Yadav",
+              "Proposal Issue",
+              "KYC Issue"
+            ],
+            "data_name": "service_type",
+            "db_name": "service_type",
+            "is_filterable": true,
+            "name": "service_type",
+            "oasis": {
+              "name": "service_type"
+            },
+            "ui": {
+              "display_name": "Service Type",
+              "is_sortable": true,
+              "placeholder": "Add Service Type"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "service_type",
+            "type": "string"
+          },
+          "reference_name": "service_type",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "enum",
+            "allowed_values": [
+              "app",
+              "email",
+              "portal",
+              "plug",
+              "slack"
+            ],
+            "data_name": "source_channel",
+            "db_name": "source_channel",
+            "is_filterable": true,
+            "name": "source_channel",
+            "oasis": {
+              "name": "source_channel"
+            },
+            "ui": {
+              "display_name": "Source Channel",
+              "is_sortable": true,
+              "placeholder": "Add Source Channel Type"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "source_channel",
+            "type": "string"
+          },
+          "reference_name": "source_channel",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "id",
+            "data_name": "stage_id",
+            "db_name": "stage_id",
+            "id_type": [
+              "custom_stage"
+            ],
+            "is_filterable": true,
+            "name": "stage_id",
+            "oasis": {
+              "name": "stage_id"
+            },
+            "ui": {
+              "display_name": "Stage",
+              "placeholder": "Add Stage Name"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "stage_json->>'$.stage_id'",
+            "type": "string"
+          },
+          "reference_name": "stage_id",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "enum",
+            "allowed_values": [
+              "ticket"
+            ],
+            "data_name": "type",
+            "db_name": "type",
+            "is_filterable": true,
+            "name": "type",
+            "oasis": {
+              "name": "type"
+            },
+            "ui": {
+              "display_name": "Type",
+              "filter_view": {
+                "is_hidden": true
+              },
+              "is_sortable": true,
+              "placeholder": "Add Type"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "object_type",
+            "type": "string"
+          },
+          "reference_name": "type",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "id",
+            "data_name": "reports_to_id",
+            "db_name": "reports_to_id",
+            "id_type": [
+              "dev_user"
+            ],
+            "is_filterable": true,
+            "name": "reports_to_id",
+            "oasis": {
+              "name": "reports_to_id"
+            },
+            "ui": {
+              "display_name": "Report To",
+              "is_groupable": true,
+              "is_sortable": true,
+              "placeholder": "Add Agent"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "reports_to_id",
+            "type": "string"
+          },
+          "reference_name": "reports_to_id",
+          "type": "native"
+        }
+      ],
+      "measures": [
+        {
+          "devrev_schema": {
+            "field_type": "int",
+            "data_name": "total_count",
+            "db_name": "total_count",
+            "name": "total_count",
+            "oasis": {
+              "name": "total_count"
+            },
+            "ui": {
+              "display_name": "Total Count",
+              "is_sortable": true,
+              "placeholder": "Add Total Count"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "COUNT(DISTINCT object)",
+            "type": "number"
+          },
+          "reference_name": "total_count",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "int",
+            "data_name": "total_promoter",
+            "db_name": "total_promoter",
+            "name": "total_promoter",
+            "oasis": {
+              "name": "total_promoter"
+            },
+            "ui": {
+              "display_name": "Total Promoter (4-5)",
+              "is_sortable": true,
+              "placeholder": "Add Total Promoter"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "COUNT(DISTINCT CASE WHEN rating IN (4,5) THEN object END)",
+            "type": "number"
+          },
+          "reference_name": "total_promoter",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "int",
+            "data_name": "total_detractor",
+            "db_name": "total_detractor",
+            "name": "total_detractor",
+            "oasis": {
+              "name": "total_detractor"
+            },
+            "ui": {
+              "display_name": "Total Detractor (1-2)",
+              "is_sortable": true,
+              "placeholder": "Add Total Detractor"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "COUNT(DISTINCT CASE WHEN rating IN (1,2) THEN object END)",
+            "type": "number"
+          },
+          "reference_name": "total_detractor",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "int",
+            "data_name": "total_neutral",
+            "db_name": "total_neutral",
+            "name": "total_neutral",
+            "oasis": {
+              "name": "total_neutral"
+            },
+            "ui": {
+              "display_name": "Total Neutral (3)",
+              "is_sortable": true,
+              "placeholder": "Add Total Neutral"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "COUNT(DISTINCT CASE WHEN rating = 3 THEN object END)",
+            "type": "number"
+          },
+          "reference_name": "total_neutral",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "double",
+            "data_name": "promoter_percent",
+            "db_name": "promoter_percent",
+            "name": "promoter_percent",
+            "oasis": {
+              "name": "promoter_percent"
+            },
+            "ui": {
+              "display_name": "Promoter %",
+              "is_sortable": true,
+              "placeholder": "Add Promoter %"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "ROUND((COUNT(DISTINCT CASE WHEN rating IN (4,5) THEN object END) * 100.0) / NULLIF(COUNT(DISTINCT object), 0), 2)",
+            "type": "number"
+          },
+          "reference_name": "promoter_percent",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "double",
+            "data_name": "detractor_percent",
+            "db_name": "detractor_percent",
+            "name": "detractor_percent",
+            "oasis": {
+              "name": "detractor_percent"
+            },
+            "ui": {
+              "display_name": "Detractor %",
+              "is_sortable": true,
+              "placeholder": "Add Detractor %"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "ROUND((COUNT(DISTINCT CASE WHEN rating IN (1,2) THEN object END) * 100.0) / NULLIF(COUNT(DISTINCT object), 0), 2)",
+            "type": "number"
+          },
+          "reference_name": "detractor_percent",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "double",
+            "data_name": "neutral_percent",
+            "db_name": "neutral_percent",
+            "name": "neutral_percent",
+            "oasis": {
+              "name": "neutral_percent"
+            },
+            "ui": {
+              "display_name": "Neutral %",
+              "is_sortable": true,
+              "placeholder": "Add Neutral %"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "ROUND((COUNT(DISTINCT CASE WHEN rating = 3 THEN object END) * 100.0) / NULLIF(COUNT(DISTINCT object), 0), 2)",
+            "type": "number"
+          },
+          "reference_name": "neutral_percent",
+          "type": "native"
+        },
+        {
+          "devrev_schema": {
+            "field_type": "double",
+            "data_name": "csat_score_percent",
+            "db_name": "csat_score_percent",
+            "name": "csat_score_percent",
+            "oasis": {
+              "name": "csat_score_percent"
+            },
+            "ui": {
+              "display_name": "CSAT % Score",
+              "is_sortable": true,
+              "placeholder": "Add CSAT % Score"
+            }
+          },
+          "meerkat_schema": {
+            "sql_expression": "ROUND(((COUNT(DISTINCT CASE WHEN rating IN (4,5) THEN object END) - COUNT(DISTINCT CASE WHEN rating IN (1,2) THEN object END)) * 100.0) / NULLIF(COUNT(DISTINCT object), 0), 2)",
+            "type": "number"
+          },
+          "reference_name": "csat_score_percent",
+          "type": "native"
+        }
+      ],
+      "oasis": {
+        "datasets": [
+          "devrev.dim_ticket",
+          "devrev.dim_group",
+          "devrev.dim_survey_response",
+          "devrev.dim_devu"
+        ],
+        "sql_query": "SELECT * FROM (WITH csat_responses AS (SELECT sr.*, json_extract(sr.response, '$.rating') AS rating, ROW_NUMBER() OVER (PARTITION BY sr.display_id ORDER BY sr.modified_date DESC) AS rn FROM devrev.dim_survey_response sr WHERE json_extract(sr.response, '$.rating') IS NOT NULL), merged AS (SELECT t.id AS object, t.\"group\" AS group_id, t.*, t.stage_json, g.name AS group_name, cr.rating, cr.created_date AS csat_sent_date, cr.modified_date AS csat_response_date, u.owner_id, du.id AS user_id, du.reports_to_id, json_extract_string(t.custom_fields, '$.tnt__business_type') AS business_type, json_extract_string(t.custom_fields, '$.tnt__product_type') AS product_types, json_extract_string(t.custom_fields, '$.tnt__association_type') AS association_type, json_extract_string(t.custom_fields, '$.tnt__service_request_type') AS service_type FROM devrev.dim_ticket t LEFT JOIN csat_responses cr ON cr.object = t.id AND cr.rn = 1 LEFT JOIN devrev.dim_group g ON t.group = g.id CROSS JOIN UNNEST(t.owned_by_ids) AS u(owner_id) LEFT JOIN devrev.dim_devu du ON du.id = u.owner_id) SELECT * FROM merged WHERE rating IS NOT NULL AND group_id NOT IN ('don:identity:dvrv-in-1:devo/2CUcav2K66:group/14')) AS csat"
+      },
+      "reference_name": "csat",
+      "type": "oasis"
+    }
+  ],
+  "description": "CSAT AGENT SCORE",
+  "id": "don:data:dvrv-in-1:devo/2CUcav2K66:widget/T5poDgSMNv",
+  "layout": [
+    {
+      "position": {
+        "height": 8,
+        "width": 8,
+        "x": 0,
+        "y": 0
+      },
+      "reference_id": "weekly_table"
+    }
+  ],
+  "object_version": 8,
+  "sub_widgets": [
+    {
+      "query": {
+        "dimensions": [
+          "csat.owner_id"
+        ],
+        "measures": [
+          "csat.total_count",
+          "csat.total_promoter",
+          "csat.total_detractor",
+          "csat.total_neutral",
+          "csat.promoter_percent",
+          "csat.detractor_percent",
+          "csat.neutral_percent",
+          "csat.csat_score_percent"
+        ],
+        "order_by": [
+          {
+            "direction": "descending",
+            "reference_name": "csat.total_count"
+          }
+        ]
+      },
+      "reference_id": "csat-agent-type",
+      "visualization": {
+        "table": {
+          "columns": [
+            {
+              "is_hidden": false,
+              "is_movable": true,
+              "is_resizable": true,
+              "label": "Agents",
+              "order": 0,
+              "reference_name": "csat.owner_id",
+              "width": 182
+            },
+            {
+              "drill_throughs": [
+                {
+                  "dashboard": "don:data:dvrv-in-1:devo/2CUcav2K66:dashboard/XzMTAYONGD",
+                  "dashboard_v1": "don:DEV-2CUcav2K66:dashboard:XzMTAYONGD",
+                  "label": "drill"
+                }
+              ],
+              "is_hidden": false,
+              "is_movable": true,
+              "is_resizable": true,
+              "label": "Total Count",
+              "order": 1,
+              "reference_name": "csat.total_count",
+              "width": 120
+            },
+            {
+              "drill_throughs": [
+                {
+                  "dashboard": "don:data:dvrv-in-1:devo/2CUcav2K66:dashboard/D7KSYtWgm9",
+                  "dashboard_v1": "don:DEV-2CUcav2K66:dashboard:D7KSYtWgm9",
+                  "label": "drill"
+                }
+              ],
+              "is_hidden": false,
+              "is_movable": true,
+              "is_resizable": true,
+              "label": "Promoters (4-5)",
+              "order": 2,
+              "reference_name": "csat.total_promoter",
+              "width": 130
+            },
+            {
+              "drill_throughs": [
+                {
+                  "dashboard": "don:data:dvrv-in-1:devo/2CUcav2K66:dashboard/uCo8yB5juH",
+                  "dashboard_v1": "don:DEV-2CUcav2K66:dashboard:uCo8yB5juH",
+                  "label": "drill"
+                }
+              ],
+              "is_hidden": false,
+              "is_movable": true,
+              "is_resizable": true,
+              "label": "Detractors (1-2)",
+              "order": 3,
+              "reference_name": "csat.total_detractor",
+              "width": 130
+            },
+            {
+              "drill_throughs": [
+                {
+                  "dashboard": "don:data:dvrv-in-1:devo/2CUcav2K66:dashboard/4JAG3JlJG2",
+                  "dashboard_v1": "don:DEV-2CUcav2K66:dashboard:4JAG3JlJG2",
+                  "label": "drill"
+                }
+              ],
+              "is_hidden": false,
+              "is_movable": true,
+              "is_resizable": true,
+              "label": "Neutral (3)",
+              "order": 4,
+              "reference_name": "csat.total_neutral",
+              "width": 120
+            },
+            {
+              "is_hidden": false,
+              "is_movable": true,
+              "is_resizable": true,
+              "label": "Promoter %",
+              "order": 5,
+              "reference_name": "csat.promoter_percent",
+              "width": 120
+            },
+            {
+              "is_hidden": false,
+              "is_movable": true,
+              "is_resizable": true,
+              "label": "Detractor %",
+              "order": 6,
+              "reference_name": "csat.detractor_percent",
+              "width": 120
+            },
+            {
+              "is_hidden": false,
+              "is_movable": true,
+              "is_resizable": true,
+              "label": "Neutral %",
+              "order": 7,
+              "reference_name": "csat.neutral_percent",
+              "width": 120
+            },
+            {
+              "is_hidden": false,
+              "is_movable": true,
+              "is_resizable": true,
+              "label": "CSAT Score %",
+              "order": 8,
+              "reference_name": "csat.csat_score_percent",
+              "width": 153
+            }
+          ]
+        },
+        "type": "table"
+      }
+    }
+  ],
+  "title": "CSAT AGENT DASHBOARD (Real Time)",
+  "version": "v0"
+}

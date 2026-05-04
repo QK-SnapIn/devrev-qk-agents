@@ -70,21 +70,30 @@ Builds TypeScript connectors that sync data between external systems and DevRev.
 - Platform provides `lastSuccessfulSyncStarted` — no webhook registration needed
 - `chef-cli validate-metadata` + `configure-mappings` for AirSync
 
-### 2. Implementation Vertical (dashboards)
+### 2. Implementation Vertical (dashboards, workflows, objects)
 
-Builds widget JSON and dashboard layouts for DevRev's analytics system.
+Builds importable DevRev configuration across three domains — analytics dashboards, workflow automations, and custom object types.
 
 | Command | Agent | What it does |
 |---------|-------|-------------|
-| `/devrev:plan-implementation` | Implementation PM | Gathers dashboard requirements → widget specs |
-| `/devrev:build-implementation` | Implementation Architect | Generates widget JSON → dashboard layout |
-| `/devrev:test-implementation` | Implementation Tester | JSON validation checklist → UI verification |
+| `/devrev:plan-implementation` | Implementation PM | Classifies domain → focused discovery → domain-tagged `spec.md` |
+| `/devrev:build-implementation` | Implementation Architect | Routes on `domain:` tag → generates domain-specific JSON |
+| `/devrev:test-implementation` | Implementation Tester | Static lint + live schema check + dry-run import |
+
+**Domain → output mapping:**
+
+| Domain | Output | Deployment |
+|--------|--------|-----------|
+| `dashboard` | `widget-*.json` + `dashboard.json` | widget-preview → dashboard-preview |
+| `workflow` | `workflow-template.json` | Import via DevRev Automation settings |
+| `object` | `leaf-type-schema.json` | Import via DevRev Object settings |
 
 **Key technical facts:**
-- Widget JSON: `data_sources` (oasis) → `dimensions` + `measures` → `sub_widgets` → `visualization`
+- Dashboard: `data_sources` (oasis) → `dimensions` + `measures` → `sub_widgets` → `visualization`
 - SQL rules: No `SELECT *`, no table aliases in `sql_expression`, fully qualify all references
-- Deployment: widget-preview → widget ID → dashboard-preview → dashboard ID
-- Visualization types: metric, line, column, bar, table, donut, pie, packed_bubble, heatmap
+- Workflow: AMC trigger + condition + action blocks; architect fetches live schemas via `bin/devrev-api`
+- Object: `leaf-type-schema.json` adds fields to existing DevRev object types (ticket, part, etc.)
+- `bin/devrev-api` requires `~/.devrev/config.json` with `pat` and `base_url`
 
 ### 3. Cross-cutting: Skill Improver
 
@@ -116,14 +125,21 @@ devrev-qk-agents/
     │   ├── implementation-tester.md
     │   └── skill-improver.md
     │
-    ├── commands/                          # Slash commands (7)
+    ├── commands/                          # Slash commands (11)
     │   ├── plan-snapin.md
     │   ├── build-snapin.md
     │   ├── test-snapin.md
+    │   ├── update-snapin.md
+    │   ├── generate-metadata.md
+    │   ├── search-guide.md
     │   ├── plan-implementation.md
     │   ├── build-implementation.md
     │   ├── test-implementation.md
-    │   └── improve-skill.md
+    │   ├── improve-skill.md
+    │   └── update.md
+    │
+    ├── bin/                               # CLI tools
+    │   └── devrev-api                     # DevRev API CLI (live schema grounding for implementation vertical)
     │
     ├── skills/                            # Skills + references
     │   ├── devrev-snapin-pm/
@@ -140,6 +156,7 @@ devrev-qk-agents/
     │   │   └── references/
     │   │       ├── simple-snapin.md       # Simple snap-in project structure
     │   │       ├── airsync-template.md    # AirSync snap-in scaffold
+    │   │       ├── mcp-tools.md           # Snap-in Builder MCP tool reference
     │   │       └── cli-workflow.md        # DevRev CLI commands
     │   │
     │   ├── devrev-snapin-tester/
@@ -149,39 +166,87 @@ devrev-qk-agents/
     │   │       └── ui-automation-flow.md  # Browser-driven E2E flow
     │   │
     │   ├── devrev-imp-pm/
-    │   │   ├── SKILL.md                   # Dashboard PM workflow
+    │   │   ├── SKILL.md                   # Multi-domain PM workflow
     │   │   └── references/
-    │   │       ├── discovery-questions.md  # Question bank by dashboard domain
-    │   │       ├── dashboard-spec-template.md  # Spec format
-    │   │       └── system-tables.md       # DevRev data model (tables, columns, joins)
+    │   │       ├── domain-classifier.md   # Domain classification rules (dashboard/workflow/object)
+    │   │       ├── discovery-dashboard.md # Discovery questions for dashboards
+    │   │       ├── discovery-workflow.md  # Discovery questions for workflow automations
+    │   │       ├── discovery-object.md    # Discovery questions for custom object types
+    │   │       └── spec-template.md       # Domain-tagged spec format
     │   │
     │   ├── devrev-imp-architect/
-    │   │   ├── SKILL.md                   # Widget builder workflow
+    │   │   ├── SKILL.md                   # Multi-domain architect workflow
     │   │   └── references/
-    │   │       ├── widget-json-reference.md    # Widget JSON structure
-    │   │       ├── sql-rules.md               # MANDATORY SQL rules
+    │   │       ├── dashboard-json-rules.md    # Dashboard + widget JSON rules
+    │   │       ├── workflow-json-rules.md     # AMC workflow JSON rules
+    │   │       ├── object-json-rules.md       # Custom leaf-type schema rules
+    │   │       ├── devrev-api-cli.md          # bin/devrev-api usage (live schema grounding)
+    │   │       ├── sql-rules.md               # MANDATORY SQL rules (dashboard only)
     │   │       └── visualization-catalog.md   # JSON patterns for all viz types
     │   │
     │   ├── devrev-imp-tester/
-    │   │   ├── SKILL.md                   # Dashboard tester workflow
+    │   │   ├── SKILL.md                   # Multi-domain tester workflow
     │   │   └── references/
-    │   │       ├── json-validation-checklist.md  # Pre-deployment checklist
-    │   │       └── ui-verification-flow.md       # Browser verification flow
+    │   │       ├── validation-dashboard.md    # Dashboard validation checklist
+    │   │       ├── validation-workflow.md     # Workflow validation checklist
+    │   │       └── validation-object.md       # Object validation checklist
     │   │
     │   └── devrev-skill-improver/
     │       └── SKILL.md                   # Self-learning/patch workflow
     │
-    ├── examples/                          # Real PRD/TDD examples
+    ├── examples/                          # Real PRD/TDD + implementation JSON examples
     │   ├── example-trello-prd.md
     │   ├── example-trello-tdd.md
     │   ├── example-slack-tdd.md
     │   ├── example-monday-tdd.md
     │   ├── example-planhat-prd.md
-    │   └── example-snowflake-prd.md
+    │   ├── example-snowflake-prd.md
+    │   └── implementation/
+    │       ├── dashboard/                 # Sample dashboard + widget JSON
+    │       ├── workflow/                  # Sample AMC workflow templates
+    │       └── object/                    # Sample leaf-type schema fragments
     │
     └── docs/
-        └── CHANGELOG.md                   # Version history + learnings
+        ├── CHANGELOG.md                   # Version history + learnings
+        └── PROJECT-GUIDE.md               # This file
 ```
+
+## Setup: DevRev API Credentials (implementation vertical)
+
+The implementation commands use `bin/devrev-api` to ground JSON generation against your live DevRev schema. This is required for workflow and object domains; optional but recommended for dashboards.
+
+### 1. Create `~/.devrev/config.json`
+
+```bash
+mkdir -p ~/.devrev
+cat > ~/.devrev/config.json << 'EOF'
+{
+  "pat": "<your DevRev PAT>",
+  "base_url": "https://api.devrev.ai"
+}
+EOF
+chmod 600 ~/.devrev/config.json
+```
+
+Get your PAT from DevRev → Settings → API tokens. The `chmod 600` keeps it owner-readable only.
+
+### 2. Make the CLI executable
+
+```bash
+chmod +x devrev-agents/bin/devrev-api
+```
+
+### 3. Verify
+
+```bash
+devrev-agents/bin/devrev-api list-operations | jq '.operations | length'
+```
+
+Should return a count. If it fails, double-check the PAT and `base_url` in the config file.
+
+> **Note:** `~/.devrev/config.json` is a user-level file — never commit it. Add `~/.devrev/` to your global `.gitignore` if needed.
+
+---
 
 ## How to Create a New Snap-in (Step by Step)
 
@@ -279,9 +344,12 @@ The Skill Improver will:
 | Wrong SDK method or import | `references/airsync-template.md` |
 | Wrong CLI command | `references/cli-workflow.md` |
 | Bad PRD/TDD structure | `references/prd-template.md` or `tdd-template.md` |
-| Wrong widget JSON | `references/widget-json-reference.md` |
+| Wrong dashboard/widget JSON | `references/dashboard-json-rules.md` |
 | Wrong SQL in widget | `references/sql-rules.md` |
 | Wrong visualization | `references/visualization-catalog.md` |
+| Wrong workflow JSON | `references/workflow-json-rules.md` |
+| Wrong object schema JSON | `references/object-json-rules.md` |
+| bin/devrev-api auth or schema errors | `references/devrev-api-cli.md` |
 
 ## How to Add a New Agent/Skill
 
@@ -318,10 +386,20 @@ The Skill Improver will:
 - Platform provides `lastSuccessfulSyncStarted` — snap-ins do NOT manage timestamps
 - No webhook registration needed
 
-### Dashboard System
+### Implementation Vertical
+
+**Dashboards:**
 - Widget JSON → `widget-preview` → widget ID → `dashboard-preview` → dashboard ID
 - SQL: No `SELECT *`, no table aliases in `sql_expression`, fully qualify all references
 - Viz types: metric, line, column, bar, table, donut, pie, packed_bubble, heatmap
+
+**Workflows:**
+- AMC automation templates — trigger + condition + action blocks
+- Live operation schemas fetched via `bin/devrev-api` before generating JSON
+
+**Custom objects:**
+- `leaf-type-schema.json` — adds or modifies fields on existing DevRev object types
+- Supported field types: text, enum, boolean, date, reference, multi-value
 
 ### DevRev CLI (key commands)
 ```bash

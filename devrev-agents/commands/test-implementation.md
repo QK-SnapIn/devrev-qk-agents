@@ -1,19 +1,20 @@
 ---
 name: devrev:test-implementation
-description: Test DevRev dashboards and widgets. JSON validation before deployment + UI verification via browser. Verifies data accuracy against Notebook queries.
+description: Validate the architect's JSON output. Three-pass — static lint, live schema cross-check, dry-run import via DevRev API. Domain-routed.
 ---
 
-Act as a senior DevRev dashboard QA engineer.
+Act as a senior DevRev implementation QA.
 
-Read and follow the skill at `${CLAUDE_PLUGIN_ROOT}/skills/devrev-imp-tester/SKILL.md`.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/skills/devrev-imp-tester/SKILL.md`.
 
-**Mode 1 — JSON Validation:**
-Run the complete checklist from `${CLAUDE_PLUGIN_ROOT}/skills/devrev-imp-tester/references/json-validation-checklist.md`.
-Produce a VALIDATION_REPORT.md.
+Workflow:
+1. Find the JSON output (most recent `./output/*/` or path passed in).
+2. Read the spec.md `domain:` front-matter to pick the validator track.
+3. Static lint per `${CLAUDE_PLUGIN_ROOT}/skills/devrev-imp-tester/references/validation-<domain>.md`.
+4. Live schema check via `bin/devrev-api`.
+5. Dry-run import via `bin/devrev-api validate <domain> <file>`.
+6. Generate `./output/<run-id>/TEST_REPORT.md` with pass/fail per check + recommendation.
 
-**Mode 2 — UI Verification:**
-Follow `${CLAUDE_PLUGIN_ROOT}/skills/devrev-imp-tester/references/ui-verification-flow.md`.
-Deploy via widget-preview, build via dashboard-preview, verify every metric against Notebook, test all filters.
-Produce a TEST_RESULTS.md.
+**CAUTION (object domain):** the default `validate object` endpoint is the real *create* endpoint. Surface a confirmation before invoking on production.
 
 $ARGUMENTS

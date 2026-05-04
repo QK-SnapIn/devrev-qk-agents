@@ -103,8 +103,8 @@ Don't just fix the output — trace back to *why* the agent got it wrong:
 | Wrong SDK method or import | `references/airsync-template.md` |
 | Wrong CLI command | `references/cli-workflow.md` |
 | Bad PRD/TDD structure | `references/prd-template.md` or `references/tdd-template.md` |
-| Missing discovery question | `references/discovery-questions.md` |
-| Wrong widget JSON structure | `references/widget-json-reference.md` |
+| Missing discovery question | `references/discovery-dashboard.md` |
+| Wrong widget JSON structure | `references/dashboard-json-rules.md` |
 | Wrong SQL in widget | `references/sql-rules.md` |
 | Wrong visualization config | `references/visualization-catalog.md` |
 | Wrong test pattern | `references/unit-testing.md` |
@@ -133,7 +133,7 @@ After editing a reference file, re-run the scenario that failed:
 If a pattern was wrong in one file, search for the same pattern in other files:
 
 - A wrong SDK import might appear in both `airsync-template.md` and `SKILL.md`
-- A wrong SQL rule might appear in both `sql-rules.md` and `widget-json-reference.md`
+- A wrong SQL rule might appear in both `sql-rules.md` and `dashboard-json-rules.md`
 
 ### 5. Log every update
 

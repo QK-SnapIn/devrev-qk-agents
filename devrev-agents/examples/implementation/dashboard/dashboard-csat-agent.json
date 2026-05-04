@@ -1,0 +1,69 @@
+{
+  "description": "",
+  "id": "don:data:dvrv-in-1:devo/2CUcav2K66:dashboard/aPr5pH17Zo",
+  "layout": [
+    {
+      "layout": [
+        {
+          "position": {
+            "height": 11,
+            "width": 12,
+            "x": 0,
+            "y": 0
+          },
+          "reference_id": "csat-agent-type-new"
+        },
+        {
+          "position": {
+            "height": 11,
+            "width": 12,
+            "x": 0,
+            "y": 11
+          },
+          "reference_id": "csat-service-type"
+        }
+      ],
+      "reference_id": "csat-agent"
+    }
+  ],
+  "object_version": 12,
+  "tabs": [
+    {
+      "reference_id": "csat-agent",
+      "title": "CSAT Agent Dashboard"
+    }
+  ],
+  "timezone": "Auto-detect",
+  "title": "CSAT Agent Dashboard - Real Time",
+  "widgets": [
+    {
+      "reference_id": "csat-agent-type-new",
+      "widget": "don:data:dvrv-in-1:devo/2CUcav2K66:widget/T5poDgSMNv"
+    },
+    {
+      "reference_id": "csat-service-type",
+      "widget": "don:data:dvrv-in-1:devo/2CUcav2K66:widget/L4RQME7R5y"
+    }
+  ],
+  "filters": [
+    {
+      "expression": {
+        "operands": [
+          {
+            "condition": {
+              "json_value": [
+                "ticket"
+              ],
+              "key": "type",
+              "operator": "equals",
+              "value_type": "json_value"
+            },
+            "type": "condition"
+          }
+        ],
+        "operator": "and"
+      },
+      "reference_id": "csat-agent"
+    }
+  ]
+}
