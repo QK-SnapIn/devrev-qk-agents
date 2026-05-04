@@ -18,13 +18,23 @@ AI-powered agents that plan, build, and test snap-ins, connectors, and dashboard
 | **Snap-in Architect** | Researches external APIs (never guesses), makes 15 engineering decisions, generates complete deployable projects using ADaaS SDK |
 | **Snap-in Tester** | Writes Jest unit tests, performs UI automation via browser to install snap-in, configure mapping, run sync, and verify imported data |
 
-### Implementation vertical (v1.1)
+### Implementation vertical (v1.2)
+
+Three domains, one pipeline — dashboards, workflows, and custom objects.
 
 | Agent | What it does |
 |-------|-------------|
-| **Implementation PM** | Gathers dashboard requirements in focused rounds (3-5 questions each), produces structured widget specs with data sources, visualizations, and filters. Handles both new dashboards and fix requests |
-| **Implementation Architect** | Generates complete widget JSON for widget-preview, assembles dashboard layouts for dashboard-preview. Fix mode: fetches existing JSON, diagnoses SQL/reference issues, produces corrected JSON with diff |
-| **Implementation Tester** | JSON validation checklist (catches 90% of errors before deployment) + UI verification via browser (widget-preview → dashboard-preview → Notebook cross-check for data accuracy) |
+| **Implementation PM** | Classifies the request by domain (dashboard / workflow / object), runs focused discovery rounds (3-5 questions each), produces a domain-tagged `spec.md` |
+| **Implementation Architect** | Routes on the `domain:` tag in `spec.md` — generates widget + dashboard JSON for dashboards, AMC workflow templates for automations, or custom `leaf-type-schema.json` for object customizations. Uses the DevRev API CLI for live schema grounding |
+| **Implementation Tester** | Static JSON lint + live schema check via `bin/devrev-api` + dry-run import. Domain-specific validation checklists for each output type |
+
+**Domain → output mapping:**
+
+| Domain | Output files |
+|--------|-------------|
+| `dashboard` | `widget-*.json` + `dashboard.json` |
+| `workflow` | `workflow-template.json` |
+| `object` | `leaf-type-schema.json` |
 
 ### Cross-cutting
 
@@ -41,6 +51,39 @@ AI-powered agents that plan, build, and test snap-ins, connectors, and dashboard
 ```
 
 That's it. All 7 agents, 11 commands, and 7 skills are ready to use.
+
+### DevRev API credentials (required for implementation vertical)
+
+The implementation commands use a local CLI tool (`bin/devrev-api`) to ground JSON generation against your live DevRev schema. Set it up once:
+
+**1. Create the config file:**
+
+```bash
+mkdir -p ~/.devrev
+cat > ~/.devrev/config.json << 'EOF'
+{
+  "pat": "<your DevRev PAT>",
+  "base_url": "https://api.devrev.ai"
+}
+EOF
+chmod 600 ~/.devrev/config.json
+```
+
+Your PAT is in DevRev → Settings → API tokens. Keep `~/.devrev/config.json` out of version control.
+
+**2. Make the CLI executable:**
+
+```bash
+chmod +x devrev-agents/bin/devrev-api
+```
+
+**3. Smoke test:**
+
+```bash
+devrev-agents/bin/devrev-api list-operations | jq '.operations | length'
+```
+
+Should return a number. If it errors, check your PAT and `base_url`.
 
 ### MCP Server Setup (Required for snap-in commands)
 
@@ -105,6 +148,8 @@ cp -r devrev-qk-agents/devrev-agents/skills/* /path/to/your/project/.cursor/skil
 
 ## Usage
 
+### Snap-in vertical
+
 ```bash
 # Plan a connector
 /devrev:plan-snapin Build an AirSync connector for HubSpot
@@ -116,18 +161,26 @@ cp -r devrev-qk-agents/devrev-agents/skills/* /path/to/your/project/.cursor/skil
 /devrev:test-snapin Write unit tests and run E2E test for the HubSpot connector
 ```
 
-Or just use natural language:
+### Implementation vertical
 
+```bash
+# Dashboard
+/devrev:plan-implementation I need a CSAT dashboard broken down by agent and ticket type
+/devrev:build-implementation
+/devrev:test-implementation
+
+# Workflow automation
+/devrev:plan-implementation Send a weekly status digest to Slack every Monday at 9am
+/devrev:build-implementation
+/devrev:test-implementation
+
+# Custom object type
+/devrev:plan-implementation Add a Priority Reason field to support tickets with 4 enum values
+/devrev:build-implementation
+/devrev:test-implementation
 ```
-You: "I need to sync Asana tasks into DevRev"
-→ PM agent activates, gathers requirements
 
-You: "Generate the TypeScript code for the extractor"
-→ Architect agent activates, researches Asana API, builds code
-
-You: "Test this connector end-to-end"
-→ Tester agent activates, writes tests + drives UI
-```
+The PM agent auto-classifies the domain from your description — you don't specify it manually.
 
 ## How the pipelines work
 
@@ -148,13 +201,25 @@ See the [architecture diagram above](#architecture) for the complete flow. Both 
 - Architect researches real API docs before writing code (never hallucinates)
 - 15 engineering decisions documented before any code generation
 
-### Dashboard development
-- Widget JSON → widget-preview → widget ID → dashboard-preview → dashboard ID
+### Implementation vertical
+
+**Dashboards:**
+- Widget JSON → `widget-preview` → widget ID → `dashboard-preview` → dashboard ID
 - Widget structure: `data_sources` (oasis) → `dimensions` + `measures` → `sub_widgets` → `visualization`
 - SQL rules: No `SELECT *`, no table aliases in `sql_expression`, list every column, fully qualify all references
 - Visualization types: metric, line, column, bar, table, donut, pie, packed_bubble, heatmap
 - Dashboard grid: 12 columns wide. Metric cards (height:2), Charts (height:4), Tables (height:6)
 - Dashboard URL: `https://app.devrev.ai/<slug>/dashboard?dashboardId=<ID>`
+
+**Workflows:**
+- AMC (Automation) templates — trigger + condition + action blocks
+- Architect fetches live trigger/action schemas via `bin/devrev-api` before generating JSON
+- Output is a `workflow-template.json` importable via DevRev settings
+
+**Custom objects:**
+- `leaf-type-schema.json` — adds fields to an existing DevRev object type (e.g., ticket subtype)
+- Supports field types: text, enum, boolean, date, reference, multi-value
+- Architect grounds field options against live schema to avoid type mismatches
 
 ## Real document examples
 

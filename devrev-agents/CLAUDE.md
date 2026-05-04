@@ -13,9 +13,23 @@ AI-powered agents for building on DevRev's AgentOS platform. Plan, build, and te
 - `/devrev:search-guide` — Quick reference lookup for AirSync patterns
 
 ### Implementation vertical
-- `/devrev:plan-implementation` — Plan dashboards, widgets, analytics (PM agent)
-- `/devrev:build-implementation` — Generate widget JSON + dashboard layout (Architect agent)
-- `/devrev:test-implementation` — JSON validation + UI verification (Tester agent)
+Single vertical, three commands, three domains (`dashboard | workflow | object`):
+
+- `/devrev:plan-implementation` — Plan a dashboard, workflow, or custom-object (PM agent). Writes domain-tagged `spec.md`.
+- `/devrev:build-implementation` — Generate importable JSON for the chosen domain (Architect agent). Routes on `domain:` front-matter.
+- `/devrev:test-implementation` — Static lint + live schema check + dry-run import (Tester agent).
+
+**Setup (one-time, for live API grounding):**
+1. Create `~/.devrev/config.json`: `{ "pat": "<your DevRev PAT>", "base_url": "https://api.devrev.ai" }`
+2. Make CLI executable: `chmod +x devrev-agents/bin/devrev-api`
+3. Smoke test: `devrev-agents/bin/devrev-api list-operations | jq '.operations | length'`
+
+**Domain → output mapping:**
+- dashboard → `widget-*.json` + `dashboard.json`
+- workflow → `workflow-template.json`
+- object → `leaf-type-schema.json` (custom schema fragment)
+
+Output dir: `./output/<YYYYMMDD-HHMM>-<domain>/`.
 
 ### Cross-cutting
 - `/devrev:improve-skill` — Report mistakes, update agent skills (Self-learning agent)

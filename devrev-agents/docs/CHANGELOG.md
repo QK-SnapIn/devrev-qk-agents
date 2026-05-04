@@ -6,6 +6,54 @@ Track every improvement made to DevRev agent skills based on real usage feedback
 
 <!-- New entries go at the top -->
 
+## v1.4.0 — 2026-05-02
+
+### Implementation vertical: multi-domain expansion (dashboard + workflow + object)
+
+The implementation vertical previously handled dashboards only. It now covers all three DevRev configuration domains through a single command set, with domain auto-classification and separate reference stacks per domain.
+
+#### Domain classifier added to PM skill
+- **Trigger**: All implementation requests were assumed to be dashboard requests, causing the PM to ask irrelevant questions for workflow and object customization tasks.
+- **Change**: PM skill now reads `domain-classifier.md` on intake to classify the request as `dashboard`, `workflow`, or `object` before starting discovery. Classification is surfaced to the user for confirmation.
+- **Files changed**: `skills/devrev-imp-pm/SKILL.md` (Phase 0 added), `agents/implementation-pm.md`
+- **Files added**: `skills/devrev-imp-pm/references/domain-classifier.md`
+
+#### Per-domain discovery question banks
+- **Trigger**: Dashboard discovery questions (data sources, SQL, visualizations) were irrelevant for workflow automations and object customizations.
+- **Change**: Three separate discovery files, one per domain. PM routes to the right file after classification.
+- **Files added**: `skills/devrev-imp-pm/references/discovery-dashboard.md`, `skills/devrev-imp-pm/references/discovery-object.md`, `skills/devrev-imp-pm/references/discovery-workflow.md`
+- **Files renamed**: `discovery-questions.md` → `discovery-dashboard.md`, `dashboard-spec-template.md` → `spec-template.md`
+
+#### Per-domain spec template
+- **Trigger**: Spec template had dashboard-only fields (widget specs, SQL, visualization types) with no structure for workflow triggers/actions or object field definitions.
+- **Change**: `spec-template.md` now has three sections gated by `domain:` front-matter. Architect reads only the section for its domain.
+- **Files changed**: `skills/devrev-imp-pm/references/spec-template.md` (formerly `dashboard-spec-template.md`)
+
+#### Architect skill: workflow and object JSON generation
+- **Trigger**: Architect only knew how to generate widget + dashboard JSON. Workflow and object domains had no build path.
+- **Change**: Architect skill routes on `domain:` tag — dashboard path unchanged, workflow path generates AMC automation templates, object path generates `leaf-type-schema.json` custom type fragments.
+- **Files changed**: `skills/devrev-imp-architect/SKILL.md` (Phase 2 routing added), `agents/implementation-architect.md`
+- **Files added**: `skills/devrev-imp-architect/references/workflow-json-rules.md`, `skills/devrev-imp-architect/references/object-json-rules.md`
+- **Files renamed**: `widget-json-reference.md` → `dashboard-json-rules.md`
+
+#### DevRev API CLI for live schema grounding
+- **Trigger**: Architect was generating workflow trigger/action schemas and object field types from static knowledge, causing mismatches with the live DevRev schema.
+- **Change**: Added `bin/devrev-api` CLI tool. Architect calls it before generating workflow or object JSON to fetch live operation schemas. Dashboard generation unchanged (uses oasis SQL).
+- **Files added**: `bin/devrev-api`, `skills/devrev-imp-architect/references/devrev-api-cli.md`
+- **Setup required**: `~/.devrev/config.json` with `pat` and `base_url` fields.
+
+#### Tester skill: per-domain validation checklists
+- **Trigger**: Single JSON validation checklist covered dashboard fields only. Workflow and object JSON have different required fields and failure modes.
+- **Change**: Three separate validation checklists, one per domain. Tester routes to the right checklist, then runs `bin/devrev-api` dry-run import for all domains.
+- **Files added**: `skills/devrev-imp-tester/references/validation-object.md`, `skills/devrev-imp-tester/references/validation-workflow.md`
+- **Files renamed**: `json-validation-checklist.md` → `validation-dashboard.md`
+- **Files changed**: `skills/devrev-imp-tester/SKILL.md` (routing added), `agents/implementation-tester.md`
+
+#### Reference examples added
+- **Files added**: `examples/implementation/dashboard/dashboard-csat-agent.json`, `examples/implementation/dashboard/widget-csat-agent.json`, `examples/implementation/workflow/amc-send-reminder.json`, `examples/implementation/workflow/weekly-status-enhancement.json`, `examples/implementation/object/custom-leaf-type-example.json`
+
+---
+
 ## v1.3.0 — 2026-03-20
 
 ### Build workflow: SDK update, common/ directory, code review, 3 MCP servers

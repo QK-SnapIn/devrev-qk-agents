@@ -1,6 +1,22 @@
-# JSON Validation Checklist
+# Dashboard Validation Checklist
 
-Run through every check for each widget JSON before deployment. This catches 90% of errors before they hit the UI.
+Run through every check for each widget + dashboard JSON before declaring it ready to import. This catches 90% of errors before they hit the UI.
+
+## Quick three-pass
+
+1. **Static lint** — sections A through G below.
+2. **Live schema check** — `bin/devrev-api list-datasets` → confirm every `data_sources[].oasis.datasets` entry is a real dataset ID in this tenant. If any are missing, fail with the missing IDs.
+3. **Dry-run** — `bin/devrev-api validate dashboard <file>`. Exit 0 = pass; exit 1 = fail with API error; exit 2 = config not set, warn and downgrade to lint+live-only.
+
+## Error → owner mapping
+
+| Error class | Owner | Example |
+|---|---|---|
+| Bad JSON shape, missing required key, SQL grammar error | architect | "missing `data_sources` array" |
+| Dataset ID not in tenant | architect (re-pick from `list-datasets`) | |
+| Wrong dataset chosen for the metric (user wanted CSAT, got NPS) | PM | |
+| Missing widget the user asked for | PM | |
+| Same systematic mistake from same agent twice | suggest `/devrev:improve-skill` | |
 
 ---
 

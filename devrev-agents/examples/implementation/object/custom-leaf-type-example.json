@@ -1,0 +1,51 @@
+{
+  "type": "custom_type_fragment",
+  "leaf_type": "ticket",
+  "subtype": "tnt__support_request",
+  "fields": [
+    {
+      "name": "tnt__priority_reason",
+      "field_type": "enum",
+      "allowed_values": [
+        "VIP customer",
+        "Production down",
+        "Compliance",
+        "Other"
+      ],
+      "ui": {
+        "display_name": "Priority Reason",
+        "placeholder": "Why is this priority?"
+      },
+      "is_required": false
+    },
+    {
+      "name": "tnt__customer_account_id",
+      "field_type": "text",
+      "ui": {
+        "display_name": "Customer Account ID",
+        "placeholder": "e.g. ACC-12345"
+      },
+      "is_required": true
+    },
+    {
+      "name": "tnt__estimated_loss_inr",
+      "field_type": "int",
+      "ui": {
+        "display_name": "Estimated Loss (INR)",
+        "placeholder": "0"
+      },
+      "is_required": false
+    }
+  ],
+  "conditions": [
+    {
+      "expression": "custom_fields.tnt__priority_reason != \"Other\"",
+      "effects": [
+        {
+          "fields": ["custom_fields.tnt__estimated_loss_inr"],
+          "show": false
+        }
+      ]
+    }
+  ]
+}

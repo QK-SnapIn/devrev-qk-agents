@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+# devrev-api — small CLI wrapper for DevRev internal API.
+# Reads PAT from $DEVREV_CONFIG (default ~/.devrev/config.json).
+# Always emits JSON to stdout. Errors to stderr. Exit codes:
+#   0 ok, 1 API/validation error, 2 config error, 3 usage error.
+set -euo pipefail
+
+CONFIG_PATH="${DEVREV_CONFIG:-$HOME/.devrev/config.json}"
+
+usage() {
+  cat <<'EOF' >&2
+Usage:
+  devrev-api list-operations [--filter <text>]
+  devrev-api list-datasets
+  devrev-api get-object-schema <leaf_type>
+  devrev-api validate <dashboard|workflow|object> <path-to-json>
+
+Reads ~/.devrev/config.json (or $DEVREV_CONFIG):
+  { "pat": "<token>", "base_url": "https://api.devrev.ai" }
+EOF
+  exit 3
+}
+
+require() {
+  command -v "$1" >/dev/null 2>&1 || {
+    echo "missing dependency: $1" >&2
+    exit 2
+  }
+}
+require curl
+require jq
+
+load_config() {
+  if [[ ! -f "$CONFIG_PATH" ]]; then
+    echo "config not found at $CONFIG_PATH" >&2
+    echo "create it: { \"pat\": \"<DevRev PAT>\", \"base_url\": \"https://api.devrev.ai\" }" >&2
+    exit 2
+  fi
+  PAT=$(jq -er '.pat' "$CONFIG_PATH" 2>/dev/null) || { echo "missing .pat in $CONFIG_PATH" >&2; exit 2; }
+  BASE_URL=$(jq -er '.base_url // "https://api.devrev.ai"' "$CONFIG_PATH")
+}
+
+api_get() {
+  local path="$1"
+  curl -sS -X GET "${BASE_URL}${path}" \
+    -H "Authorization: ${PAT}" \
+    -H "Content-Type: application/json"
+}
+
+api_post() {
+  local path="$1"
+  local body="$2"
+  curl -sS -X POST "${BASE_URL}${path}" \
+    -H "Authorization: ${PAT}" \
+    -H "Content-Type: application/json" \
+    -d "${body}"
+}
+
+cmd="${1:-}"
+shift || true
+case "$cmd" in
+  list-operations)
+    load_config
+    filter=""
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --filter) filter="$2"; shift 2 ;;
+        *) echo "unexpected arg: $1" >&2; exit 3 ;;
+      esac
+    done
+    resp=$(api_get "/internal/operations.list")
+    if [[ -n "$filter" ]]; then
+      echo "$resp" | jq --arg f "$filter" '{operations: [.operations[] | select((.name // "") | test($f; "i"))]}'
+    else
+      echo "$resp"
+    fi
+    ;;
+
+  list-datasets)
+    load_config
+    api_get "/internal/oasis.dataset.list"
+    ;;
+
+  get-object-schema)
+    # Endpoint confirmed in user's Postman collection (Object Customization/Claude code.postman_collection.json):
+    #   GET https://api.devrev.ai/internal/schemas.custom.list?leaf_type=<type>
+    load_config
+    leaf_type="${1:-}"
+    [[ -z "$leaf_type" ]] && { echo "usage: devrev-api get-object-schema <leaf_type>" >&2; exit 3; }
+    endpoint_path="${DEVREV_OBJECT_SCHEMA_PATH:-/internal/schemas.custom.list?leaf_type=${leaf_type}}"
+    resp=$(api_get "$endpoint_path")
+    if echo "$resp" | jq -e '.error // .errors' >/dev/null 2>&1; then
+      echo "$resp" >&2
+      exit 1
+    fi
+    echo "$resp"
+    ;;
+
+  validate)
+    # Best-effort dry-run import. /internal/ paths below are educated guesses.
+    # Object validate currently uses the real create endpoint /internal/schemas.custom.set
+    # (confirmed in user's Postman) — be aware this WILL create the schema fragment if successful.
+    # Dashboard/workflow validate paths are unconfirmed; override via env vars if needed.
+    # If any endpoint returns 404/error, caller (tester agent) should fall back to static + live-schema-check.
+    load_config
+    domain="${1:-}"; file="${2:-}"
+    [[ -z "$domain" || -z "$file" ]] && { echo "usage: devrev-api validate <dashboard|workflow|object> <file>" >&2; exit 3; }
+    [[ ! -f "$file" ]] && { echo "file not found: $file" >&2; exit 3; }
+    body=$(jq -c '.' "$file")
+    case "$domain" in
+      dashboard) endpoint="${DEVREV_DASHBOARD_VALIDATE_PATH:-/internal/dashboards.preview}" ;;
+      workflow)  endpoint="${DEVREV_WORKFLOW_VALIDATE_PATH:-/internal/workflows.import.dry-run}" ;;
+      object)    endpoint="${DEVREV_OBJECT_VALIDATE_PATH:-/internal/schemas.custom.set}" ;;
+      *) echo "unknown domain: $domain" >&2; exit 3 ;;
+    esac
+    resp=$(api_post "$endpoint" "$body")
+    if echo "$resp" | jq -e '.errors // .error' >/dev/null 2>&1; then
+      echo "$resp" >&2
+      echo '{"ok": false}'
+      exit 1
+    fi
+    echo "$resp" | jq '. + {ok: true}'
+    ;;
+
+  ""|-h|--help)
+    usage
+    ;;
+
+  *)
+    echo "unknown subcommand: $cmd" >&2
+    usage
+    ;;
+esac
