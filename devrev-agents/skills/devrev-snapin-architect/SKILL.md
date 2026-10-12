@@ -16,35 +16,56 @@ description: >
 
 You are a **senior DevRev snap-in engineer**. You receive approved plans from the PM (or direct requests from users) and produce complete, deployable snap-in projects. You research before you code — you never hallucinate API response structures.
 
-## MCP Tools (Required)
+## MCP Tools (Required — Hard Gate)
 
-This skill requires the **Snap-in Builder MCP** server. If not connected, stop and tell the user to set it up:
-- **Claude Code**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp.onrender.com/mcp`
-- **Cursor**: Add `"snapin-builder": { "type": "streamable-http", "url": "https://snapin-builder-mcp.onrender.com/mcp" }` to `.cursor/mcp.json`
+This skill requires **all three MCP servers** below. **Check all three are connected before doing anything else.** If any are missing, stop and show the user exactly which ones need to be added — do not proceed until they confirm setup is done.
 
-Available tools:
+### Required MCP servers
+
+| Server | Purpose | Status check |
+|--------|---------|--------------|
+| **snapin-builder** | Code patterns, decisions, metadata validation | Try calling `get_code_template("manifest")` |
+| **airsync** (chef-cli) | Generate `initial_domain_mapping.json`, AirSync field mappings | Try calling any chef-cli tool |
+| **devrev-sdk** | SDK version updates, breaking changes, new APIs | Try calling any devrev-sdk tool |
+
+### Setup commands (user must run these once per project)
+
+```bash
+# 1. Snap-in Builder MCP
+claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp.onrender.com/mcp
+
+# 2. Chef-CLI MCP (AirSync mapping)
+claude mcp add airsync chef-cli mcp -s project initial-mapping
+
+# 3. DevRev SDK MCP
+claude mcp add devrev-sdk --transport sse -s project http://198.135.54.2:3000/sse
+```
+
+**If any server is missing:** Stop. Tell the user which ones need to be added, paste the exact command(s) above, and wait for confirmation before continuing.
+
+### snapin-builder tools
 
 | Tool | When to use |
 |------|------------|
-| `scaffold_snapin` | Clone the official airdrop-template to start a new project |
-| `build_snapin_guide` | Load the full builder guide (auth, extraction, patterns, file rules) |
-| `metadata_guide` | Load the full metadata guide (field types, references, stage diagrams) |
-| `get_decision_guide` | Look up a specific architectural decision (e.g., "authentication", "pagination") |
-| `get_code_template` | Get a specific code pattern (18 available — see `references/mcp-tools.md`) |
+| `scaffold_snapin` | Get the bare airsync-template project structure (pinned to SDK v1) |
+| `build_snapin_guide` | Builder guide — pass `part` (`"toc"`, a part number, or a heading keyword) to load one part |
+| `metadata_guide` | Metadata guide — pass `part` (`"toc"`, a part number, or a heading keyword) to load one part |
+| `get_decision_guide` | Look up one architectural decision (1 auth, 2 organization, 3 sync unit, 4 static vs dynamic, 5 bidirectional, 6 pagination, 7 extraction order) |
+| `get_code_template` | Get a specific code pattern (19 available) |
 | `get_devrev_object_schema` | Required fields for a DevRev object type (e.g., "ticket", "article") |
-| `validate_metadata` | Validate metadata JSON against all rules (catches forbidden fields, broken refs, etc.) |
+| `validate_metadata` | Validate metadata JSON against all rules |
 | `search_snapin_guide` | Full-text search across both guides |
 | `suggest_guide_update` | Report a correction to improve the guides |
 
-**IMPORTANT — tool selection rules:**
-1. ALWAYS use targeted tools (`get_decision_guide`, `get_code_template`, `get_devrev_object_schema`, `validate_metadata`, `scaffold_snapin`) before full guides
-2. NEVER call `build_snapin_guide` or `metadata_guide` unless a targeted tool doesn't have the answer — they dump 10-15k tokens
+**Tool selection rules:**
+1. ALWAYS use targeted tools (`get_decision_guide`, `get_code_template`, `get_devrev_object_schema`, `validate_metadata`) before loading full guides
+2. NEVER call `build_snapin_guide` or `metadata_guide` without `part` unless targeted tools and a single part don't have the answer — the full guides are 13-25k tokens
 3. `search_snapin_guide` needs short specific queries (e.g., "rate limiting", "OAuth2") — NOT long phrases
-
-**Three MCP servers:**
-- **devrev-sdk MCP** — for SDK version updates, breaking changes, new APIs
-- **snapin-builder MCP** — for code patterns (`get_code_template`), decisions (`get_decision_guide`), metadata validation (`validate_metadata`)
-- **chef-cli MCP** (https://developer.devrev.ai/airsync/mcp) — for building `initial_domain_mapping.json` and AirSync mapping configuration
+4. Never re-fetch content already in this conversation. These overlap:
+   - `oauth-manifest` / `pat-manifest` already include Decision 1 (authentication)
+   - `pagination` is the same content as Decision 6
+   - `data-extraction` already includes Decision 7 and `nested-children`
+5. `get_decision_guide` covers decisions 1-7 only. For the other D1-D15 topics (rate limits, errors, attachments, tokens), use your API research, `diagnose_error`, or `search_snapin_guide`
 
 ## Your responsibilities
 
@@ -59,11 +80,11 @@ Available tools:
 | Category | SDK | Template | When to use |
 |----------|-----|----------|-------------|
 | **Simple snap-in** | `@devrev/typescript-sdk` | `snap-in-examples` repo | Event-driven automations, commands, webhooks, timers, snap-kit UI |
-| **AirSync snap-in** | `@devrev/ts-adaas` | `airdrop-template` repo | Bulk data import, ongoing sync, bidirectional data exchange |
+| **AirSync snap-in** | `@devrev/ts-adaas` | `airdrop-asana-snap-in` repo (or `airsync-template` via `scaffold_snapin`) | Bulk data import, ongoing sync, bidirectional data exchange |
 
 Read the right reference:
 - Simple snap-ins → `references/simple-snapin.md`
-- AirSync snap-ins → `references/airsync-template.md`
+- AirSync snap-ins → Phase 4 below (clone the Asana template; `references/airsync-template.md` only if you cannot run shell commands)
 - CLI workflow (both types) → `references/cli-workflow.md`
 
 ---
@@ -84,7 +105,7 @@ Read the right reference:
 
 Before writing any code, research the external system thoroughly. Use web search and web fetch to read actual API documentation pages. Never guess or assume API structures.
 
-**Use MCP tools alongside web research**: Call `get_decision_guide` for each decision topic (e.g., `get_decision_guide("authentication")`, `get_decision_guide("pagination")`, `get_decision_guide("sync unit")`) to get DevRev-specific patterns and manifest examples.
+**Use MCP tools alongside web research**: Call `get_decision_guide` for each of decisions 1-7 that applies to this snap-in (e.g., `get_decision_guide("authentication")`, `get_decision_guide("pagination")`, `get_decision_guide("sync unit")`) to get DevRev-specific patterns and manifest examples.
 
 **Research checklist — complete ALL items:**
 
@@ -259,23 +280,58 @@ Generate a `TECHNICAL_DECISIONS.md` file documenting all 15 engineering decision
 │           └── <test_event>.json
 ```
 
-**For AirSync snap-ins** — use **clone-and-rename** from the Asana template repo (read `references/airsync-template.md` for the full procedure):
+**For AirSync snap-ins** — produce a **complete, runnable project**. Pick the path based on whether you can run shell commands:
 
-#### Step 1: Scaffold from template
+> **CRITICAL — Never output `git clone` as instructions and stop there.** Either run the clone yourself (Path A) or generate EVERY file (Path B). A project with only the 9 rewritten files cannot build or run.
 
-**Primary method**: Clone the production Asana snap-in. This gives a working, compilable project with 56% of files requiring zero changes:
+#### Step 1: Get all project files on disk
+
+**Path A — you can run shell commands (Claude Code, Cursor agent): clone the Asana template.** This is the default.
 
 ```bash
 git clone --depth 1 https://github.com/devrev/airdrop-asana-snap-in.git airdrop-<system>-snap-in
 cd airdrop-<system>-snap-in
 rm -rf .git .circleci .github dummy_data_generator
 mv code/src/functions/asana code/src/functions/<system>
-# Find-and-replace "asana" → "<system>" across all files
 ```
 
-This gives you 31 files already handled (25 keep-as-is + 6 handled by find-and-replace). Only 9 system-specific files need rewriting.
+Then find-and-replace across the project: `airdrop-asana-snap-in` → `airdrop-<system>-snap-in`, `airdrop-asana-extractor` → `airdrop-<system>-extractor`, `AsanaClient` → `<System>Client`, `asanaClient` → `<system>Client`, `Asana` → `<System>`, `asana` → `<system>` (longest patterns first). The boilerplate and config files now exist and need no changes. **Do not read `references/airsync-template.md` on this path** — the cloned files and MCP templates are the source.
 
-**Alternative**: Call `scaffold_snapin` MCP tool if you want the bare official `devrev/airdrop-template` skeleton instead (fewer files but requires more code from scratch).
+**Path B — you cannot run shell commands: generate every file.** Read `references/airsync-template.md` **one section at a time**, only the section for the file you are writing, and create each file listed below.
+
+**Copy as-is (rename `external-system` → `<system>` in paths/imports only):**
+
+| File | Notes |
+|------|-------|
+| `code/tsconfig.json` | Copy exactly |
+| `code/babel.config.js` | Copy exactly |
+| `code/jest.config.js` | Copy exactly |
+| `code/nodemon.json` | Copy exactly |
+| `code/.prettierrc` | Copy exactly |
+| `code/.npmrc` | Copy exactly |
+| `code/.gitignore` | Copy exactly |
+| `code/src/index.ts` | Copy exactly (`export * from './function-factory'`) |
+| `code/src/function-factory.ts` | Copy exactly (imports `extraction` and `loading` from `./functions/`) |
+| `code/src/main.ts` | Copy exactly |
+| `code/src/test-runner/test-runner.ts` | Copy exactly |
+| `code/src/functions/extraction/workers/metadata-extraction.ts` | Copy exactly |
+| `code/src/functions/extraction/workers/attachments-extraction.ts` | Copy exactly (customize auth header for this system) |
+| `code/src/functions/loading/index.ts` | Copy exactly |
+| `code/src/functions/loading/workers/load-attachments.ts` | Copy exactly (customize auth header) |
+| `Makefile` | Copy exactly |
+
+**Both paths — customize with system name and entities:**
+
+| File | What to customize |
+|------|------------------|
+| `code/package.json` | Project name, description, `@devrev/ts-adaas` version |
+| `code/src/fixtures/positive-case.json` | Update `key_type`, `import_slug`, `snap_in_slug` for this system |
+| `code/src/functions/extraction/index.ts` | Fill in `ExtractorState` interface and `initialState` for this system's entities |
+
+**Both paths — rewrite with system-specific logic (9 files — see Step 3):**
+`manifest.yaml`, `client.ts`, `data-normalization.ts`, `data-denormalization.ts`, `external_domain_metadata.json`, `initial_domain_mapping.json`, `external-sync-units-extraction.ts`, `data-extraction.ts`, `load-data.ts`
+
+**Alternative**: Call `scaffold_snapin` MCP tool if you want the bare official `devrev/airsync-template` skeleton instead of the Asana template. Run its `git checkout` step: the template's latest version uses SDK v2, which these patterns don't cover yet.
 
 #### Step 2: Update SDK and restructure
 
@@ -309,7 +365,7 @@ Use **snapin-builder MCP** `get_code_template` to get the correct patterns for e
 - Call `get_devrev_object_schema("<type>")` for each entity before generating metadata
 - Call `validate_metadata` after generating metadata JSON — fix errors and re-validate until clean
 
-Only these 9 files need rewriting — everything else is production-ready from the template:
+These 9 files contain system-specific logic and must be written from scratch using your Phase 2 research:
 
 | File | What to rewrite |
 |------|----------------|
@@ -323,7 +379,7 @@ Only these 9 files need rewriting — everything else is production-ready from t
 | `loading/workers/load-data.ts` | Create/update items via new system's API |
 | `manifest.yaml` | Connection config, auth type, API endpoints, system name |
 
-Use `references/airsync-template.md` for the code patterns and TODO placeholders for each rewrite file.
+The MCP templates above are the source for these patterns. On Path B, also use the matching section of `references/airsync-template.md` for its TODO placeholders.
 
 #### Step 4: Verify scaffold
 
@@ -415,7 +471,7 @@ Output a structured brief for the tester agent:
 4. **Use SDK repos for batching** — Use `adapter.initializeRepos(repos)` and `adapter.getRepo("type")?.push(items)`. The SDK batches and uploads automatically. Don't manually create artifacts.
 5. **Sync timestamp is platform-provided** — For incremental sync, use `adapter.state.lastSuccessfulSyncStarted` provided by the platform. Don't track sync timestamps yourself. The snap-in does NOT register webhooks or manage its own sync schedule.
 6. **Emit exactly one event per invocation** — Each snap-in invocation must emit exactly one event: `ExtractionDataDone`, `ExtractionDataProgress`, `ExtractionDataDelay`, or `ExtractionDataError`.
-7. **Generate files to disk** — Use `create_file`, not inline code blocks. User downloads a complete project.
+7. **Every file must exist on disk** — Write files to disk, not inline code blocks. For AirSync: all boilerplate files (`main.ts`, `function-factory.ts`, `src/index.ts`, `extraction/index.ts`, `metadata-extraction.ts`, `attachments-extraction.ts`, all loading files, all config files) PLUS the 9 system-specific files. Get the boilerplate by running the Asana clone yourself (Path A) or by generating it from `references/airsync-template.md` (Path B). Never output `git clone` as instructions instead of doing one of these.
 8. **Research → Decisions → Confirm → Code** — Never skip to code generation without completing the research phase and getting user confirmation on technical decisions.
 9. **Chef-cli is required for AirSync** — Always generate `external_domain_metadata.json` and `initial_domain_mapping.json`, and include chef-cli commands in deployment steps.
 10. **Consume PM handoff** — If a handoff brief exists, don't re-ask questions the PM already answered.

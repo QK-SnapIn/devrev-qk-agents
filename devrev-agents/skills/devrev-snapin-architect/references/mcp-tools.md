@@ -1,6 +1,6 @@
 # Snap-in Builder MCP Tools Reference
 
-The Snap-in Builder MCP server provides 9 tools for building DevRev AirSync snap-ins.
+The Snap-in Builder MCP server provides 19 tools for building DevRev AirSync snap-ins. This page covers the ones the architect uses.
 
 ## Setup
 
@@ -24,21 +24,21 @@ claude mcp add snapin-builder --transport http -s project https://snapin-builder
 ## Full Guide Tools
 
 ### `build_snapin_guide`
-Returns the complete builder guide. Use when you need comprehensive context for generating a full snap-in codebase. Covers: authentication patterns, extraction phases, entity mapping, state management, rate limiting, error handling, and file-by-file generation rules.
+Returns the builder guide (~25k tokens in full). Covers: authentication patterns, extraction phases, entity mapping, state management, rate limiting, error handling, and file-by-file generation rules.
 
-- **Parameters**: none
-- **When to use**: Only when targeted tools don't have enough context
+- **Parameters**: `part` (optional) — `"toc"` for the table of contents, a part number (`"1"`-`"6"`), or a heading keyword. Omit for the full guide.
+- **When to use**: Only when targeted tools don't have enough context. Load one part, not the whole guide
 
 ### `metadata_guide`
-Returns the complete metadata generator guide. Use when generating `external_domain_metadata.json` or `initial_domain_mapping.json`. Covers: field types, reference syntax, collection syntax, stage diagrams, DevRev object type mappings, and validation rules.
+Returns the metadata generator guide (~13k tokens in full). Covers: field types, reference syntax, collection syntax, stage diagrams, DevRev object type mappings, and validation rules.
 
-- **Parameters**: none
-- **When to use**: Only when `get_devrev_object_schema` and `validate_metadata` aren't sufficient
+- **Parameters**: `part` (optional) — `"toc"`, a part number (`"1"`-`"8"`), or a heading keyword (e.g. `"field types"`). Omit for the full guide.
+- **When to use**: For metadata generation load parts 1, 2 and 7. Load the full guide only when `get_devrev_object_schema`, `validate_metadata` and single parts aren't sufficient
 
 ## Targeted Tools (prefer these)
 
 ### `scaffold_snapin`
-Clone the official DevRev AirSync template (`devrev/airdrop-template`) and get setup instructions.
+Clone the official DevRev AirSync template (`devrev/airsync-template`, formerly `airdrop-template`) and get setup instructions. The tool pins the last `@devrev/ts-adaas` v1 commit; always run its `git checkout` step.
 
 - **Parameters**:
   - `system_name` (required) — External system name (e.g., "Wrike", "HubSpot")
@@ -49,7 +49,8 @@ Clone the official DevRev AirSync template (`devrev/airdrop-template`) and get s
 Look up a specific architectural decision with code examples.
 
 - **Parameters**:
-  - `decision` (required) — Decision number (e.g., "1") or keyword (e.g., "authentication", "pagination", "sync unit", "bidirectional", "extraction order")
+  - `decision` (required) — Decision number (`"1"`-`"7"`) or keyword (e.g., "authentication", "pagination", "sync unit", "bidirectional", "extraction order")
+- **Returns**: One decision. Broad keywords that match more than 2 decisions return a list of headings to choose from
 - **When to use**: Making engineering decisions during Phase 2/3
 
 ### `get_code_template`
@@ -73,6 +74,7 @@ Return a specific code pattern from the guides.
   - `validate-input` — Input validation (verify connection, check config)
   - `stage-diagram` — Stage diagrams for workflow states
   - `custom-links` — Custom link types between entities
+  - `domain-mapping` — `initial_domain_mapping.json` rules (`map_enum`, `use_rich_text`, required fields)
   - `permissions` / `article-permissions` — Permission fields + scope patterns
 - **When to use**: Generating each system-specific file during Phase 4
 
@@ -96,6 +98,7 @@ Full-text search across both guides.
 
 - **Parameters**:
   - `query` (required) — Topic to search (e.g., "rate limiting", "ExtractionDataDelay", "OAuth2")
+- **Returns**: Up to ~12k characters; further matches are listed by heading so you can search for one specifically
 - **When to use**: When you need information on a specific topic but don't know which tool has it
 
 ### `suggest_guide_update`

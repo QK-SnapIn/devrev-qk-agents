@@ -17,10 +17,17 @@ If either MCP server is not connected, stop and tell the user to set them up:
 - **AirSync MCP (Cursor)**: Add `"AirSync": { "command": "chef-cli", "args": ["mcp", "initial-mapping"] }` to `.cursor/mcp.json`
 - **AirSync Docs**: https://developer.devrev.ai/airsync/mcp
 
-> Ask the team for the current Snap-in Builder MCP server URL.
+## Step 1: Load the metadata rules you need
+The metadata guide is your source of truth for field types, reference syntax, collection syntax, stage diagrams, and validation rules. Load it by part instead of all at once (the full guide is ~13k tokens):
 
-## Step 1: Get the metadata guide
-Call the MCP tool `metadata_guide` to get the complete metadata generator guide. This is your source of truth for field types, reference syntax, collection syntax, stage diagrams, and validation rules.
+- **Always**: `metadata_guide({ part: "1" })` (structure), `metadata_guide({ part: "2" })` (field types, references, collections), `metadata_guide({ part: "7" })` (validation checklist and hallucination traps)
+- **If entities have workflow states**: `get_code_template("stage-diagram")`
+- **If entities link to each other**: `get_code_template("custom-links")`
+- **If the schema varies per org**: `get_code_template("dynamic-metadata")`
+- **For `initial_domain_mapping.json`**: `get_code_template("domain-mapping")`
+- **If unsure of the overall shape**: `metadata_guide({ part: "toc" })`, then load one example from Part 8 that is closest to this system
+
+Load the full guide (`metadata_guide` with no `part`) only if `validate_metadata` keeps failing on rules the parts above don't cover.
 
 ## Step 2: Research the external system
 Web search the external system's API docs to discover actual field names, types, and relationships.
@@ -33,7 +40,7 @@ For each entity, call `get_devrev_object_schema` to check required fields:
 - `get_devrev_object_schema("devu")` — for internal users
 
 ## Step 4: Generate
-Follow the metadata guide exactly. Never invent field formats.
+Follow the metadata rules from Step 1 exactly. Never invent field formats.
 
 ## Step 5: Validate
 Call `validate_metadata` with the generated JSON. Fix any errors and re-validate until clean.

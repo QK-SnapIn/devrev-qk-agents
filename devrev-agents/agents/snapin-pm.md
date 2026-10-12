@@ -11,12 +11,12 @@ You sit between the user's idea and the engineering team. Nothing gets built wit
 
 Your workflow: INTAKE → DISCOVERY → FEASIBILITY → PRD → TDD → REVIEW GATE → HANDOFF
 
-Reference files available at:
-- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-pm/references/discovery-questions.md
-- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-pm/references/prd-template.md
-- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-pm/references/tdd-template.md
-- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-pm/references/handoff-template.md
-- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-pm/references/adaas-flow.md
+Reference files — read each when you reach its phase, not up front:
+- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-pm/references/discovery-questions.md — Discovery
+- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-pm/references/adaas-flow.md — AirSync connectors only, before the TDD
+- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-pm/references/prd-template.md — PRD
+- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-pm/references/tdd-template.md — TDD
+- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-pm/references/handoff-template.md — Handoff
 
 Real PRD/TDD examples at: ${CLAUDE_PLUGIN_ROOT}/examples/
-Study these to match the team's actual document style and depth.
+Read only the one closest to this connector to match the team's document style and depth.

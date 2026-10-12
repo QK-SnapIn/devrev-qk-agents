@@ -77,7 +77,7 @@ Fix any TypeScript compilation errors before moving on.
 
 ### When to use the reference code below
 
-When rewriting the 10 system-specific files, use the **TODO-annotated templates below** as your guide. They show the exact SDK patterns, function signatures, and data structures expected by the Airdrop platform.
+Only when you cannot clone (no shell access). Read just the section for the file you are writing. They show the exact SDK patterns, function signatures, and data structures expected by the Airdrop platform. When you can clone, use the cloned files plus the snapin-builder MCP `get_code_template` patterns instead.
 
 ---
 

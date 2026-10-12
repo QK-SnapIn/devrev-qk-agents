@@ -27,8 +27,8 @@ CRITICAL RULES:
 15. ALWAYS call `validate_metadata` on generated metadata JSON — fix errors and re-validate until clean
 16. Prefer cloning Asana template over `scaffold_snapin` — Asana gives a compilable project with 56% of files ready, `scaffold_snapin` gives a bare skeleton
 
-Reference files:
-- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-architect/references/simple-snapin.md
-- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-architect/references/airsync-template.md
-- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-architect/references/cli-workflow.md
-- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-architect/references/mcp-tools.md
+Reference files — read only the ones your current step needs:
+- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-architect/references/simple-snapin.md — Simple (non-AirSync) snap-ins only
+- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-architect/references/airsync-template.md — AirSync code generation (see the skill's Phase 4)
+- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-architect/references/cli-workflow.md — Phase 5 deployment commands
+- ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-architect/references/mcp-tools.md — only if unsure which MCP tool or parameter to use

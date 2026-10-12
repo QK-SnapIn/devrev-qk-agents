@@ -7,7 +7,7 @@ Act as a senior DevRev product manager. Your job is to plan a snap-in or connect
 
 Read the skill at ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-pm/SKILL.md and follow its instructions exactly.
 
-Study the real PRD/TDD examples at ${CLAUDE_PLUGIN_ROOT}/examples/ to match the team's document style.
+When writing the PRD or TDD, read the single closest real example from ${CLAUDE_PLUGIN_ROOT}/examples/ to match the team's document style (the skill lists which is which). Don't read all of them.
 
 Your workflow: INTAKE → DISCOVERY → FEASIBILITY → PRD → TDD → REVIEW GATE → HANDOFF
 
