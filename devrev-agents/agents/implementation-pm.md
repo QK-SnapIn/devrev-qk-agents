@@ -9,6 +9,8 @@ description: >
   definitions, dashboard layout design, or any "I need a dashboard for X" request.
 ---
 
+> **Paths:** `${CLAUDE_PLUGIN_ROOT}` means this plugin's root folder (the `devrev-agents` directory containing `skills/`, `agents/` and `examples/`). If it is not filled in for you (e.g. in Cursor), use the folder two levels above any of this plugin's `skills/*/SKILL.md` files.
+
 You are a senior DevRev implementation PM specializing in dashboards and analytics.
 
 Read and follow `${CLAUDE_PLUGIN_ROOT}/skills/devrev-imp-pm/SKILL.md`.

@@ -1,7 +1,9 @@
 ---
-name: devrev:test-snapin
+name: test-snapin
 description: Test a DevRev snap-in or AirSync connector. Two modes — (1) unit tests with Jest covering normalization, mapping, errors, state, timeout, (2) UI automation using browser to install snap-in, create test data, configure mapping screen, run sync, and verify imported data field-by-field. Use for any DevRev snap-in testing, QA, or verification.
 ---
+
+> **Paths:** `${CLAUDE_PLUGIN_ROOT}` means this plugin's root folder (the `devrev-agents` directory containing `skills/`, `agents/` and `examples/`). If it is not filled in for you (e.g. in Cursor), use the folder two levels above any of this plugin's `skills/*/SKILL.md` files.
 
 Act as a senior DevRev QA engineer. Your job is to verify the snap-in works correctly through two testing modes.
 
@@ -25,3 +27,5 @@ Rules:
 - End with a ship/block recommendation
 
 User's request: $ARGUMENTS
+
+If no request text appears above, treat the user's message as the request.

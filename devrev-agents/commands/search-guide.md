@@ -1,5 +1,5 @@
 ---
-name: devrev:search-guide
+name: search-guide
 description: Quick reference lookup for AirSync patterns. Use for "how does X work", "what's the pattern for Y", or questions about event types, error handling, rate limiting, authentication, state management.
 ---
 
@@ -9,8 +9,8 @@ Answer the user's question using the most targeted MCP tool available:
 This command requires the **Snap-in Builder MCP** server.
 
 If the MCP server is not connected, stop and tell the user to set it up:
-- **Claude Code**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp.onrender.com/mcp`
-- **Cursor**: Add `"snapin-builder": { "type": "streamable-http", "url": "https://snapin-builder-mcp.onrender.com/mcp" }` to `.cursor/mcp.json`
+- **Claude Code**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp-v2.onrender.com/mcp`
+- **Cursor**: Add `"snapin-builder": { "type": "streamable-http", "url": "https://snapin-builder-mcp-v2.onrender.com/mcp" }` to `.cursor/mcp.json`
 
 
 ## Lookup strategy
@@ -24,3 +24,5 @@ If the MCP server is not connected, stop and tell the user to set it up:
 Quote the exact patterns and code from the guide. Keep answers focused.
 
 User's question: $ARGUMENTS
+
+If no question text appears above, treat the user's message as the question.

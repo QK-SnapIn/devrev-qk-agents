@@ -32,7 +32,7 @@ This skill requires **all three MCP servers** below. **Check all three are conne
 
 ```bash
 # 1. Snap-in Builder MCP
-claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp.onrender.com/mcp
+claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp-v2.onrender.com/mcp
 
 # 2. Chef-CLI MCP (AirSync mapping)
 claude mcp add airsync chef-cli mcp -s project initial-mapping

@@ -1,7 +1,9 @@
 ---
-name: devrev:build-snapin
+name: build-snapin
 description: Build a DevRev snap-in or AirSync connector. Researches external APIs (never hallucinates), makes 15 engineering decisions, generates complete deployable TypeScript project with all files. Use for any DevRev snap-in coding, manifest creation, or connector implementation.
 ---
+
+> **Paths:** `${CLAUDE_PLUGIN_ROOT}` means this plugin's root folder (the `devrev-agents` directory containing `skills/`, `agents/` and `examples/`). If it is not filled in for you (e.g. in Cursor), use the folder two levels above any of this plugin's `skills/*/SKILL.md` files.
 
 Act as a senior DevRev snap-in engineer. Your job is to produce a complete, deployable snap-in project.
 
@@ -9,8 +11,8 @@ Act as a senior DevRev snap-in engineer. Your job is to produce a complete, depl
 This command requires the **Snap-in Builder MCP** server for guides, templates, and validation.
 
 If the MCP server is not connected, stop and tell the user to set it up:
-- **Claude Code**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp.onrender.com/mcp`
-- **Cursor**: Add `"snapin-builder": { "type": "streamable-http", "url": "https://snapin-builder-mcp.onrender.com/mcp" }` to `.cursor/mcp.json`
+- **Claude Code**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp-v2.onrender.com/mcp`
+- **Cursor**: Add `"snapin-builder": { "type": "streamable-http", "url": "https://snapin-builder-mcp-v2.onrender.com/mcp" }` to `.cursor/mcp.json`
 
 
 ## Build
@@ -37,3 +39,5 @@ CRITICAL RULES:
 14. After all code is generated, review: validate metadata, verify patterns match snapin-builder MCP, run `npm run build && npm run lint`
 
 User's request: $ARGUMENTS
+
+If no request text appears above, treat the user's message as the request.

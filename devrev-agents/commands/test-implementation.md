@@ -1,7 +1,9 @@
 ---
-name: devrev:test-implementation
+name: test-implementation
 description: Test DevRev dashboards and widgets. JSON validation before deployment + UI verification via browser. Verifies data accuracy against Notebook queries.
 ---
+
+> **Paths:** `${CLAUDE_PLUGIN_ROOT}` means this plugin's root folder (the `devrev-agents` directory containing `skills/`, `agents/` and `examples/`). If it is not filled in for you (e.g. in Cursor), use the folder two levels above any of this plugin's `skills/*/SKILL.md` files.
 
 Act as a senior DevRev dashboard QA engineer.
 
@@ -17,3 +19,5 @@ Deploy via widget-preview, build via dashboard-preview, verify every metric agai
 Produce a TEST_RESULTS.md.
 
 $ARGUMENTS
+
+If no request text appears above, treat the user's message as the request.

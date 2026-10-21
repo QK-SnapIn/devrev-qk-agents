@@ -1,0 +1,33 @@
+{
+  "name": "devrev",
+  "version": "1.1.0",
+  "description": "DevRev implementation agents — plan, build, and test snap-ins, connectors, dashboards, and workflows on DevRev's AgentOS platform. Covers the full pipeline: PM (requirements + PRD + TDD) → Architect (research + decisions + code) → Tester (unit tests + UI automation).",
+  "author": {
+    "name": "DevRev Implementation Team"
+  },
+  "repository": "https://github.com/QK-SnapIn/devrev-qk-agents",
+  "license": "MIT",
+  "keywords": [
+    "devrev",
+    "airdrop",
+    "airsync",
+    "adaas",
+    "snap-in",
+    "connector",
+    "agent",
+    "dashboard",
+    "workflow"
+  ],
+  "commands": [
+    "./commands/plan-snapin.md",
+    "./commands/build-snapin.md",
+    "./commands/test-snapin.md",
+    "./commands/improve-skill.md",
+    "./commands/plan-implementation.md",
+    "./commands/build-implementation.md",
+    "./commands/test-implementation.md",
+    "./commands/update-snapin.md",
+    "./commands/generate-metadata.md",
+    "./commands/search-guide.md"
+  ]
+}

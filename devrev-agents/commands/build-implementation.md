@@ -1,7 +1,9 @@
 ---
-name: devrev:build-implementation
+name: build-implementation
 description: Build DevRev dashboard widgets. Generates complete widget JSON for widget-preview, dashboard layout for dashboard-preview. Fix mode fetches existing JSON, diagnoses issues, and produces corrected JSON with diff.
 ---
+
+> **Paths:** `${CLAUDE_PLUGIN_ROOT}` means this plugin's root folder (the `devrev-agents` directory containing `skills/`, `agents/` and `examples/`). If it is not filled in for you (e.g. in Cursor), use the folder two levels above any of this plugin's `skills/*/SKILL.md` files.
 
 Act as a senior DevRev dashboard engineer.
 
@@ -19,3 +21,5 @@ ALWAYS read the 3 reference files before generating any JSON:
 Generate JSON files to disk. Present with `present_files`.
 
 $ARGUMENTS
+
+If no request text appears above, treat the user's message as the request.

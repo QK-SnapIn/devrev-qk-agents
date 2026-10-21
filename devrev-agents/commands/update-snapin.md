@@ -1,5 +1,5 @@
 ---
-name: devrev:update-snapin
+name: update-snapin
 description: Update or improve an existing DevRev AirSync snap-in. Use for "add a new entity", "fix pagination", "switch auth to OAuth", "add bidirectional loading", "add attachments", "fix rate limiting", "update metadata", or any modification to an existing snap-in project.
 ---
 
@@ -9,8 +9,8 @@ Act as a senior DevRev AirSync engineer. Your job is to update an existing AirSy
 This command requires the **Snap-in Builder MCP** server.
 
 If the MCP server is not connected, stop and tell the user to set it up:
-- **Claude Code**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp.onrender.com/mcp`
-- **Cursor**: Add `"snapin-builder": { "type": "streamable-http", "url": "https://snapin-builder-mcp.onrender.com/mcp" }` to `.cursor/mcp.json`
+- **Claude Code**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp-v2.onrender.com/mcp`
+- **Cursor**: Add `"snapin-builder": { "type": "streamable-http", "url": "https://snapin-builder-mcp-v2.onrender.com/mcp" }` to `.cursor/mcp.json`
 
 
 ## Workflow
@@ -101,3 +101,5 @@ When adding a new entity to data-extraction.ts:
 6. Read the existing code BEFORE suggesting any changes
 
 User's request: $ARGUMENTS
+
+If no request text appears above, treat the user's message as the request.

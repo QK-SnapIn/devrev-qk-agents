@@ -6,6 +6,18 @@ Track every improvement made to DevRev agent skills based on real usage feedback
 
 <!-- New entries go at the top -->
 
+## v1.5.0 — 2026-10-12
+
+### Cursor plugin support
+
+- **Trigger**: In Cursor the only install path was copying `skills/` into a project. That left out the agents, commands and MCP config.
+- **Change**: Added `devrev-agents/.cursor-plugin/plugin.json` and a root `.cursor-plugin/marketplace.json`. Cursor auto-discovers `skills/`, `agents/` and `rules/`. Commands are listed explicitly so that `update.md`, which is Claude Code only, stays out of Cursor.
+- **MCP**: `devrev-agents/mcp.json` bundles `snapin-builder`, `airsync` (`chef-cli mcp initial-mapping`) and `devrev-sdk`. Claude Code users still add MCPs as before.
+- **Rule**: `rules/devrev-platform.mdc` carries the pipeline and platform facts from `CLAUDE.md`, which Cursor doesn't load in the IDE. It uses `alwaysApply: false`, so it costs tokens only when DevRev work is detected.
+- **Command names**: `name: devrev:<cmd>` became `name: <cmd>`, because Cursor requires kebab-case. Claude Code still namespaces them as `/devrev:<cmd>`.
+- **Portability**: Each agent and command that uses `${CLAUDE_PLUGIN_ROOT}` now says how to resolve it when it isn't expanded. Each command that ends in `$ARGUMENTS` falls back to the user's message when nothing is substituted.
+- **Files**: `.cursor-plugin/marketplace.json`, `devrev-agents/.cursor-plugin/plugin.json`, `devrev-agents/mcp.json`, `devrev-agents/rules/devrev-platform.mdc`, `commands/*.md` (except `update.md`), `agents/*.md`, both READMEs
+
 ## v1.4.0 — 2026-10-12
 
 ### Token-cost reduction (no change to what gets built)
@@ -70,7 +82,7 @@ Track every improvement made to DevRev agent skills based on real usage feedback
 
 #### Snap-in Builder MCP URL published
 - **Trigger**: All files used `<MCP_SERVER_URL>` placeholder requiring users to ask the team for the URL.
-- **Change**: Replaced all 18 occurrences across 10 files with `https://snapin-builder-mcp.onrender.com`. Removed stale "Ask the team for the current MCP server URL" notes.
+- **Change**: Replaced all 18 occurrences across 10 files with `https://snapin-builder-mcp-v2.onrender.com`. Removed stale "Ask the team for the current MCP server URL" notes.
 - **Files changed**: `README.md` (root + inner), `CLAUDE.md`, `commands/build-snapin.md`, `commands/generate-metadata.md`, `commands/search-guide.md`, `commands/update-snapin.md`, `skills/devrev-snapin-architect/SKILL.md`, `skills/devrev-snapin-architect/references/mcp-tools.md`, `docs/CHANGELOG.md`
 
 ---
@@ -85,7 +97,7 @@ Integrated the Snap-in Builder MCP server as a required dependency for all snap-
 - **Trigger**: Snap-in commands relied solely on embedded reference files for AirSync knowledge. No runtime validation of generated metadata, no targeted code pattern lookups, no searchable guide content.
 - **Change**: All snap-in commands now require the Snap-in Builder MCP server. Commands check for MCP connectivity at startup and provide setup instructions if not connected.
 - **Files changed**: `commands/build-snapin.md`, `skills/devrev-snapin-architect/SKILL.md`, `agents/snapin-architect.md`, `CLAUDE.md`, `README.md` (root + inner)
-- **Setup**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp.onrender.com/mcp`
+- **Setup**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp-v2.onrender.com/mcp`
 
 #### 3 new commands
 - **`/devrev:update-snapin`** — Targeted modifications to existing snap-ins (add entity, fix pagination, switch auth, add attachments, add bidirectional loading). Reads existing project first, uses MCP tools for the right patterns, validates metadata after changes.

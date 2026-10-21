@@ -1,0 +1,16 @@
+{
+  "name": "devrev-qk-agents",
+  "owner": {
+    "name": "Quality Kiosk Technologies"
+  },
+  "metadata": {
+    "description": "AI-powered agents for building on DevRev's AgentOS platform — snap-ins, AirSync connectors, and dashboards."
+  },
+  "plugins": [
+    {
+      "name": "devrev",
+      "source": "devrev-agents",
+      "description": "AI-powered agents that plan, build, and test DevRev snap-ins, AirSync connectors, and dashboards. Covers the full pipeline: PM (requirements + PRD + TDD) → Architect (research + code) → Tester (unit tests + UI automation)."
+    }
+  ]
+}

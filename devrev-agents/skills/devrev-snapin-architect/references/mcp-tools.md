@@ -6,7 +6,7 @@ The Snap-in Builder MCP server provides 19 tools for building DevRev AirSync sna
 
 **Claude Code:**
 ```bash
-claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp.onrender.com/mcp
+claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp-v2.onrender.com/mcp
 ```
 
 **Cursor** — add to `.cursor/mcp.json`:
@@ -15,7 +15,7 @@ claude mcp add snapin-builder --transport http -s project https://snapin-builder
   "mcpServers": {
     "snapin-builder": {
       "type": "streamable-http",
-      "url": "https://snapin-builder-mcp.onrender.com/mcp"
+      "url": "https://snapin-builder-mcp-v2.onrender.com/mcp"
     }
   }
 }

@@ -1,0 +1,32 @@
+---
+description: DevRev platform facts for snap-ins, AirSync connectors, and dashboards. Apply when planning, building, testing, or reviewing DevRev snap-ins, AirSync/Airdrop connectors, manifest.yaml, or DevRev dashboard widget JSON.
+alwaysApply: false
+---
+
+# DevRev agents — pipeline and platform facts
+
+## Agent pipeline
+
+User request → PM (plan) → Architect (build) → Tester (verify). Each agent hands off to the next with a structured brief. Bugs flow back upstream:
+- **Code bugs** (wrong API call, bad manifest, SDK error) → back to the **Architect**
+- **Requirements bugs** (missing field, wrong scope, unclear mapping) → back to the **PM**
+- **Systematic agent errors** (a skill produces the same mistake repeatedly) → **Skill Improver** (`improve-skill` command)
+
+## Key DevRev technical facts
+
+- **Two snap-in types**: Simple (automations, commands, webhooks) and AirSync (data sync connectors)
+- **Simple snap-ins** use `@devrev/typescript-sdk`
+- **AirSync snap-ins** use `@devrev/ts-adaas` SDK (+ typescript-sdk for DevRev API calls)
+- **Timeout**: `processTask({ task, onTimeout })` — SDK handles 10-min soft / 13-min hard timeout
+- **Sync model**: DevRev Airdrop platform triggers periodic sync and provides `lastSuccessfulSyncStarted` — snap-ins do NOT register webhooks
+- **Batching**: `adapter.initializeRepos(repos)` + `adapter.getRepo("type").push(items)` — SDK batches automatically
+- **Mapping**: `chef-cli configure-mappings` generates `initial_domain_mapping.json`
+- **Metadata**: `chef-cli validate-metadata` validates `external_domain_metadata.json`
+- **MCP servers**: this plugin bundles `snapin-builder` (code patterns, decisions, `validate_metadata`), `airsync` (chef-cli) and `devrev-sdk`
+- **Dashboard creation**: Widget JSON → widget-preview → widget ID → dashboard-preview → dashboard ID
+- **Widget JSON**: data_sources (oasis) → dimensions + measures → sub_widgets → visualization
+- **SQL rules**: No SELECT *, no table aliases in sql_expression, list every column, fully qualify all references
+- **Visualization types**: metric, line, column, bar, table, donut, pie, packed_bubble, heatmap
+- **Dashboard URL**: `https://app.devrev.ai/<slug>/dashboard?dashboardId=<ID>`
+
+Real PRD and TDD examples are in the plugin's `examples/` folder; read only the one closest to the connector being planned.
