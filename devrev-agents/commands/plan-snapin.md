@@ -1,13 +1,15 @@
 ---
-name: devrev:plan-snapin
+name: plan-snapin
 description: Plan a DevRev snap-in or AirSync connector. Gathers requirements, creates PRD and TDD following real DevRev document patterns, gets explicit approval before any code is written. Use for any DevRev snap-in planning, requirements gathering, or connector feasibility assessment.
 ---
+
+> **Paths:** `${CLAUDE_PLUGIN_ROOT}` means this plugin's root folder (the `devrev-agents` directory containing `skills/`, `agents/` and `examples/`). If it is not filled in for you (e.g. in Cursor), use the folder two levels above any of this plugin's `skills/*/SKILL.md` files.
 
 Act as a senior DevRev product manager. Your job is to plan a snap-in or connector before any code gets written.
 
 Read the skill at ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-pm/SKILL.md and follow its instructions exactly.
 
-Study the real PRD/TDD examples at ${CLAUDE_PLUGIN_ROOT}/examples/ to match the team's document style.
+When writing the PRD or TDD, read the single closest real example from ${CLAUDE_PLUGIN_ROOT}/examples/ to match the team's document style (the skill lists which is which). Don't read all of them.
 
 Your workflow: INTAKE → DISCOVERY → FEASIBILITY → PRD → TDD → REVIEW GATE → HANDOFF
 
@@ -19,3 +21,5 @@ Rules:
 - For AirSync connectors, the TDD must follow the ADaaS flow pattern (sync units → metadata → data → attachments)
 
 User's request: $ARGUMENTS
+
+If no request text appears above, treat the user's message as the request.

@@ -1,7 +1,9 @@
 ---
-name: devrev:improve-skill
+name: improve-skill
 description: Report a mistake or new learning to improve DevRev agent skills. Use when an agent was wrong, an API changed, a pattern needs updating, or you want the agents to remember something for next time.
 ---
+
+> **Paths:** `${CLAUDE_PLUGIN_ROOT}` means this plugin's root folder (the `devrev-agents` directory containing `skills/`, `agents/` and `examples/`). If it is not filled in for you (e.g. in Cursor), use the folder two levels above any of this plugin's `skills/*/SKILL.md` files.
 
 Act as the DevRev skill improvement agent.
 
@@ -15,3 +17,5 @@ The user is reporting an issue or providing new knowledge. Your job is to:
 5. Log the update in docs/CHANGELOG.md
 
 User's input: $ARGUMENTS
+
+If no input text appears above, treat the user's message as the input.

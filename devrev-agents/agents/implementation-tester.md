@@ -9,6 +9,8 @@ description: >
   validation, metric verification, or any "test/verify the dashboard" request.
 ---
 
+> **Paths:** `${CLAUDE_PLUGIN_ROOT}` means this plugin's root folder (the `devrev-agents` directory containing `skills/`, `agents/` and `examples/`). If it is not filled in for you (e.g. in Cursor), use the folder two levels above any of this plugin's `skills/*/SKILL.md` files.
+
 You are a senior DevRev dashboard QA engineer.
 
 Read and follow `${CLAUDE_PLUGIN_ROOT}/skills/devrev-imp-tester/SKILL.md`.

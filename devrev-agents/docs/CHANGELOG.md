@@ -6,6 +6,48 @@ Track every improvement made to DevRev agent skills based on real usage feedback
 
 <!-- New entries go at the top -->
 
+## v1.5.0 — 2026-10-12
+
+### Cursor plugin support
+
+- **Trigger**: In Cursor the only install path was copying `skills/` into a project. That left out the agents, commands and MCP config.
+- **Change**: Added `devrev-agents/.cursor-plugin/plugin.json` and a root `.cursor-plugin/marketplace.json`. Cursor auto-discovers `skills/`, `agents/` and `rules/`. Commands are listed explicitly so that `update.md`, which is Claude Code only, stays out of Cursor.
+- **MCP**: `devrev-agents/mcp.json` bundles `snapin-builder`, `airsync` (`chef-cli mcp initial-mapping`) and `devrev-sdk`. Claude Code users still add MCPs as before.
+- **Rule**: `rules/devrev-platform.mdc` carries the pipeline and platform facts from `CLAUDE.md`, which Cursor doesn't load in the IDE. It uses `alwaysApply: false`, so it costs tokens only when DevRev work is detected.
+- **Command names**: `name: devrev:<cmd>` became `name: <cmd>`, because Cursor requires kebab-case. Claude Code still namespaces them as `/devrev:<cmd>`.
+- **Portability**: Each agent and command that uses `${CLAUDE_PLUGIN_ROOT}` now says how to resolve it when it isn't expanded. Each command that ends in `$ARGUMENTS` falls back to the user's message when nothing is substituted.
+- **Files**: `.cursor-plugin/marketplace.json`, `devrev-agents/.cursor-plugin/plugin.json`, `devrev-agents/mcp.json`, `devrev-agents/rules/devrev-platform.mdc`, `commands/*.md` (except `update.md`), `agents/*.md`, both READMEs
+
+## v1.4.0 — 2026-10-12
+
+### Token-cost reduction (no change to what gets built)
+
+#### AirSync builds clone first; `airsync-template.md` is the no-shell fallback
+- **Trigger**: The skill told agents to generate every file from `references/airsync-template.md` (~12k tokens) while the agent and `/devrev:build-snapin` said to clone the Asana template. Agents could load the whole file and clone anyway.
+- **Change**: Phase 4 now has Path A (run the Asana clone yourself — default, never read `airsync-template.md`) and Path B (no shell — generate every file, reading `airsync-template.md` one section at a time). The "never output `git clone` and stop" guard is kept for both paths.
+- **Files changed**: `skills/devrev-snapin-architect/SKILL.md` (Phase 4, critical rule 7, reference list), `references/airsync-template.md` ("When to use" note), `agents/snapin-architect.md` (reference list)
+
+#### `/devrev:generate-metadata` no longer forces the full metadata guide
+- **Trigger**: Step 1 always called `metadata_guide` (~13k tokens).
+- **Change**: Loads metadata guide parts 1, 2 and 7 (~4k tokens) plus targeted templates only when the snap-in needs them (stage diagrams, links, dynamic metadata, domain mapping). Full guide only if validation keeps failing. Removed the stale "ask the team for the MCP URL" note.
+- **Files changed**: `commands/generate-metadata.md`
+
+#### No duplicate MCP fetches
+- **Change**: Architect tool rules list which templates already contain which decisions, say `get_decision_guide` covers decisions 1-7 only, and require `part` for full guides. `/devrev:build-snapin` rule 13 and `/devrev:search-guide` step 5 updated to match.
+- **Files changed**: `skills/devrev-snapin-architect/SKILL.md`, `references/mcp-tools.md`, `commands/build-snapin.md`, `commands/search-guide.md`
+
+#### PM reads one example and references per phase
+- **Trigger**: PM instructions said to "study" all six examples (~22k tokens).
+- **Change**: Read only the closest example when writing the PRD or TDD; read each reference file when its phase starts.
+- **Files changed**: `skills/devrev-snapin-pm/SKILL.md`, `commands/plan-snapin.md`, `agents/snapin-pm.md`
+
+#### `scaffold_snapin` references point to the pinned v1 template
+- **Trigger**: `devrev/airdrop-template` was renamed to `devrev/airsync-template` and its latest version moved to AirSync SDK v2 (`@devrev/airsync-sdk`), which these skills don't cover yet.
+- **Change**: Architect skill and `mcp-tools.md` use the new repo name and tell agents to run the tool's `git checkout` step (last v1 commit).
+- **Files changed**: `skills/devrev-snapin-architect/SKILL.md`, `references/mcp-tools.md`
+
+> Requires snapin-builder MCP v2.6.0 for `part`, `domain-mapping`, and the fixed section extraction. Against an older server, `part` is ignored (the full guide is returned) and `domain-mapping` returns "not found", so redeploy the MCP first.
+
 ## v1.3.0 — 2026-03-20
 
 ### Build workflow: SDK update, common/ directory, code review, 3 MCP servers
@@ -40,7 +82,7 @@ Track every improvement made to DevRev agent skills based on real usage feedback
 
 #### Snap-in Builder MCP URL published
 - **Trigger**: All files used `<MCP_SERVER_URL>` placeholder requiring users to ask the team for the URL.
-- **Change**: Replaced all 18 occurrences across 10 files with `https://snapin-builder-mcp.onrender.com`. Removed stale "Ask the team for the current MCP server URL" notes.
+- **Change**: Replaced all 18 occurrences across 10 files with `https://snapin-builder-mcp-v2.onrender.com`. Removed stale "Ask the team for the current MCP server URL" notes.
 - **Files changed**: `README.md` (root + inner), `CLAUDE.md`, `commands/build-snapin.md`, `commands/generate-metadata.md`, `commands/search-guide.md`, `commands/update-snapin.md`, `skills/devrev-snapin-architect/SKILL.md`, `skills/devrev-snapin-architect/references/mcp-tools.md`, `docs/CHANGELOG.md`
 
 ---
@@ -55,7 +97,7 @@ Integrated the Snap-in Builder MCP server as a required dependency for all snap-
 - **Trigger**: Snap-in commands relied solely on embedded reference files for AirSync knowledge. No runtime validation of generated metadata, no targeted code pattern lookups, no searchable guide content.
 - **Change**: All snap-in commands now require the Snap-in Builder MCP server. Commands check for MCP connectivity at startup and provide setup instructions if not connected.
 - **Files changed**: `commands/build-snapin.md`, `skills/devrev-snapin-architect/SKILL.md`, `agents/snapin-architect.md`, `CLAUDE.md`, `README.md` (root + inner)
-- **Setup**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp.onrender.com/mcp`
+- **Setup**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp-v2.onrender.com/mcp`
 
 #### 3 new commands
 - **`/devrev:update-snapin`** — Targeted modifications to existing snap-ins (add entity, fix pagination, switch auth, add attachments, add bidirectional loading). Reads existing project first, uses MCP tools for the right patterns, validates metadata after changes.

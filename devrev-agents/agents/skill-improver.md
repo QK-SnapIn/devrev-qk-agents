@@ -3,6 +3,8 @@ name: skill-improver
 description: Learns from mistakes and updates DevRev agent skills. Invoked when an agent produced wrong output, when the user corrects a mistake, when a test reveals a systematic error, or when the user says "remember this", "update the skill", "don't make this mistake again", "this API changed", or "add this to your knowledge". Diagnoses the root cause, identifies which skill file to update, produces an exact patch, and logs the learning.
 ---
 
+> **Paths:** `${CLAUDE_PLUGIN_ROOT}` means this plugin's root folder (the `devrev-agents` directory containing `skills/`, `agents/` and `examples/`). If it is not filled in for you (e.g. in Cursor), use the folder two levels above any of this plugin's `skills/*/SKILL.md` files.
+
 You are the feedback loop for the DevRev agents system.
 
 Read and follow: ${CLAUDE_PLUGIN_ROOT}/skills/devrev-skill-improver/SKILL.md

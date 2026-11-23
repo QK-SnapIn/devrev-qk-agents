@@ -1,7 +1,9 @@
 ---
-name: devrev:build-snapin
+name: build-snapin
 description: Build a DevRev snap-in or AirSync connector. Researches external APIs (never hallucinates), makes 15 engineering decisions, generates complete deployable TypeScript project with all files. Use for any DevRev snap-in coding, manifest creation, or connector implementation.
 ---
+
+> **Paths:** `${CLAUDE_PLUGIN_ROOT}` means this plugin's root folder (the `devrev-agents` directory containing `skills/`, `agents/` and `examples/`). If it is not filled in for you (e.g. in Cursor), use the folder two levels above any of this plugin's `skills/*/SKILL.md` files.
 
 Act as a senior DevRev snap-in engineer. Your job is to produce a complete, deployable snap-in project.
 
@@ -9,8 +11,8 @@ Act as a senior DevRev snap-in engineer. Your job is to produce a complete, depl
 This command requires the **Snap-in Builder MCP** server for guides, templates, and validation.
 
 If the MCP server is not connected, stop and tell the user to set it up:
-- **Claude Code**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp.onrender.com/mcp`
-- **Cursor**: Add `"snapin-builder": { "type": "streamable-http", "url": "https://snapin-builder-mcp.onrender.com/mcp" }` to `.cursor/mcp.json`
+- **Claude Code**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp-v2.onrender.com/mcp`
+- **Cursor**: Add `"snapin-builder": { "type": "streamable-http", "url": "https://snapin-builder-mcp-v2.onrender.com/mcp" }` to `.cursor/mcp.json`
 
 
 ## Build
@@ -18,7 +20,7 @@ Read the skill at ${CLAUDE_PLUGIN_ROOT}/skills/devrev-snapin-architect/SKILL.md 
 
 Your workflow: Read Input → Research APIs → Technical Decisions Doc → Confirm with User → Clone Asana Template → Update SDK (devrev-sdk MCP) → Add common/ (state.ts, types.ts) → Rewrite System Files (snapin-builder MCP) → Code Review → Deploy Commands → Tester Handoff
 
-For AirSync: clone the Asana template repo, rename, and rewrite the 9 system-specific files. Use targeted MCP tools (`get_decision_guide`, `get_code_template`, `get_devrev_object_schema`, `validate_metadata`) throughout. Use **chef-cli MCP** (https://developer.devrev.ai/airsync/mcp) for building `initial_domain_mapping.json`. Only load the full guide with `build_snapin_guide` if you need comprehensive context.
+For AirSync: clone the Asana template repo, rename, and rewrite the 9 system-specific files. Use targeted MCP tools (`get_decision_guide`, `get_code_template`, `get_devrev_object_schema`, `validate_metadata`) throughout. Use **chef-cli MCP** (https://developer.devrev.ai/airsync/mcp) for building `initial_domain_mapping.json`. If targeted tools aren't enough, load one part with `build_snapin_guide({ part: "toc" })` then `build_snapin_guide({ part: "<n>" })` — load the full guide only as a last resort.
 
 CRITICAL RULES:
 1. NEVER hallucinate API structures — web search and fetch actual docs before writing any code
@@ -33,7 +35,9 @@ CRITICAL RULES:
 10. Add `common/` directory: `state.ts` (move state out of extraction/index.ts), `types.ts` (API response interfaces), optionally `utils.ts` (only if common functions needed). Use **snapin-builder MCP** `get_code_template` for patterns
 11. ALWAYS call `get_code_template("data-extraction")` before generating data-extraction.ts — follow the class-based Extractor pattern exactly
 12. ALWAYS call `validate_metadata` on generated metadata JSON before finalizing
-13. Use `get_decision_guide` for each of the 15 engineering decisions alongside web research
+13. Use `get_decision_guide` for the decisions it covers (1-7) alongside web research; the other engineering decisions come from your API research. Never re-fetch a template or decision already in this conversation
 14. After all code is generated, review: validate metadata, verify patterns match snapin-builder MCP, run `npm run build && npm run lint`
 
 User's request: $ARGUMENTS
+
+If no request text appears above, treat the user's message as the request.

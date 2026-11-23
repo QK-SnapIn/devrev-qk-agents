@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "snapin-builder": {
+      "url": "https://snapin-builder-mcp-v2.onrender.com/mcp"
+    },
+    "airsync": {
+      "command": "chef-cli",
+      "args": ["mcp", "initial-mapping"]
+    },
+    "devrev-sdk": {
+      "url": "http://198.135.54.2:3000/sse"
+    }
+  }
+}

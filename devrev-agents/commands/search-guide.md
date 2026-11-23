@@ -1,5 +1,5 @@
 ---
-name: devrev:search-guide
+name: search-guide
 description: Quick reference lookup for AirSync patterns. Use for "how does X work", "what's the pattern for Y", or questions about event types, error handling, rate limiting, authentication, state management.
 ---
 
@@ -9,8 +9,8 @@ Answer the user's question using the most targeted MCP tool available:
 This command requires the **Snap-in Builder MCP** server.
 
 If the MCP server is not connected, stop and tell the user to set it up:
-- **Claude Code**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp.onrender.com/mcp`
-- **Cursor**: Add `"snapin-builder": { "type": "streamable-http", "url": "https://snapin-builder-mcp.onrender.com/mcp" }` to `.cursor/mcp.json`
+- **Claude Code**: `claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp-v2.onrender.com/mcp`
+- **Cursor**: Add `"snapin-builder": { "type": "streamable-http", "url": "https://snapin-builder-mcp-v2.onrender.com/mcp" }` to `.cursor/mcp.json`
 
 
 ## Lookup strategy
@@ -18,9 +18,11 @@ If the MCP server is not connected, stop and tell the user to set it up:
 1. **Specific decision?** → Call `get_decision_guide` (e.g., "authentication", "pagination", "bidirectional")
 2. **Code pattern?** → Call `get_code_template` (e.g., "oauth-manifest", "nested-children", "permissions")
 3. **DevRev object fields?** → Call `get_devrev_object_schema` (e.g., "ticket", "article", "devu")
-4. **General search?** → Call `search_snapin_guide` with the query
-5. **Still not enough?** → Call `build_snapin_guide` or `metadata_guide` for the full guide
+4. **General search?** → Call `search_snapin_guide` with 1-2 keywords. If it lists "More matches", search again with the heading you need
+5. **Still not enough?** → Call `build_snapin_guide({ part: "toc" })` or `metadata_guide({ part: "toc" })`, then load only the relevant part. Load a full guide (no `part`) only as a last resort
 
 Quote the exact patterns and code from the guide. Keep answers focused.
 
 User's question: $ARGUMENTS
+
+If no question text appears above, treat the user's message as the question.

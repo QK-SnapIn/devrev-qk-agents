@@ -19,10 +19,15 @@ To update to the latest version, pull the repo and restart Claude Code — or ru
 
 ### Cursor
 
+The repo is also a Cursor plugin (`devrev-agents/.cursor-plugin/plugin.json`, listed in `.cursor-plugin/marketplace.json`). Install it locally:
+
 ```bash
 git clone https://github.com/QK-SnapIn/devrev-qk-agents.git
-cp -r devrev-qk-agents/devrev-agents/skills/* /path/to/your/project/.cursor/skills/
+mkdir -p ~/.cursor/plugins/local
+ln -s "$PWD/devrev-qk-agents/devrev-agents" ~/.cursor/plugins/local/devrev
 ```
+
+Then run **Developer: Reload Window**. For a team, import this repo as a team marketplace instead. You get the same 7 agents, 7 skills and 10 commands (`/build-snapin`, `/plan-snapin`, …), a `devrev-platform` rule, and the 3 MCP servers (`snapin-builder`, `airsync`, `devrev-sdk`) from `devrev-agents/mcp.json`. `airsync` needs `chef-cli` on your `PATH`. To update, `git pull` the clone. `/devrev:update` is Claude Code only.
 
 ### MCP Server Setup (Required for snap-in commands)
 
@@ -31,17 +36,17 @@ The snap-in commands (`/devrev:build-snapin`, `/devrev:update-snapin`, `/devrev:
 **Claude Code:**
 
 ```bash
-claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp.onrender.com/mcp
+claude mcp add snapin-builder --transport http -s project https://snapin-builder-mcp-v2.onrender.com/mcp
 ```
 
-**Cursor** — add to `.cursor/mcp.json`:
+**Cursor** — bundled with the plugin; nothing to add. If you only copied the skills, add to `.cursor/mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "snapin-builder": {
       "type": "streamable-http",
-      "url": "https://snapin-builder-mcp.onrender.com/mcp"
+      "url": "https://snapin-builder-mcp-v2.onrender.com/mcp"
     }
   }
 }

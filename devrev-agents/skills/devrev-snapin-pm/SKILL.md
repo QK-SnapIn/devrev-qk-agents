@@ -80,7 +80,7 @@ Read `references/discovery-questions.md` for the full question bank organized by
 
 **For AirSync connectors specifically**, also read `references/adaas-flow.md` to understand the standard ADaaS pipeline phases. Your TDD must map to these phases.
 
-**Real examples are available** in the `examples/` directory at the plugin root — study these to match the tone, depth, and format your team actually uses:
+**Real examples are available** in the `examples/` directory at the plugin root to match the tone, depth, and format your team actually uses. When writing a PRD or TDD, read **only the one example closest** to this connector (same document type, similar sync direction) — not all of them. Each is 2-6k tokens:
 - `example-slack-tdd.md` — AirSync TDD for Slack channel import
 - `example-monday-tdd.md` — AirSync TDD for Monday.com integration
 - `example-planhat-prd.md` — PRD for Planhat bidirectional sync
